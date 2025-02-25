@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Program\Setup\Experiments\" />
+    <Folder Include="Program\AIS\VALIS\" />
   </ItemGroup>
 
 </Project>
