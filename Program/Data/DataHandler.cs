@@ -22,8 +22,8 @@ namespace AISIGA.Program.Data
             {
                 case 0:
                     // Load the test dataset
-                    filePath = "Data/DataSets/Spirals.txt";
-                    labelIndex = 0;
+                    filePath = "Program/Data/Datasets/spirals.txt";
+                    labelIndex = 2;
                     break;
                 case 1:
                     // Load the first dataset
