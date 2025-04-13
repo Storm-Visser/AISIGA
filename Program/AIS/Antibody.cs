@@ -8,10 +8,10 @@ namespace AISIGA.Program.AIS
 {
     class Antibody
     {
-        private int Class;
-        private int BaseRadius;
-        private double[] FeatureValues;
-        private double[] FeatureMultipliers;
+        private int Class { get; set; }
+        private int BaseRadius { get; set; }
+        private double[] FeatureValues { get; set; }
+        private double[] FeatureMultipliers { get; set; }
 
         public Antibody(int assignedClass, int baseRadius, int amountOfFeatures)
         {

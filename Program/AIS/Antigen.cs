@@ -8,17 +8,15 @@ namespace AISIGA.Program.AIS
 {
     class Antigen
     {
-        private int AssingedClass;
-        private int ActualClass;
-        private int BaseRadius;
-        private int[] FeatureValues;
+        private int AssingedClass { get; set; }
+        private int ActualClass { get; set; }
+        private double[] FeatureValues { get; set; }
 
-        public Antigen(int assignedClass, int actualClass, int baseRadius, int amountOfFeatures)
+        public Antigen(int assignedClass, int actualClass, int amountOfFeatures)
         {
             AssingedClass = assignedClass;
             ActualClass = actualClass;
-            BaseRadius = baseRadius;
-            FeatureValues = new int[amountOfFeatures];
+            FeatureValues = new double[amountOfFeatures];
         }
 
         public int GetAssignedClass()
@@ -31,19 +29,25 @@ namespace AISIGA.Program.AIS
             return ActualClass;
         }
 
-        public int GetBaseRadius()
-        {
-            return BaseRadius;
-        }
 
-        public int[] GetFeatureValues()
+        public double[] GetFeatureValues()
         {
             return FeatureValues;
+        }
+
+        public void SetFeatureValues(double[] values)
+        {
+            FeatureValues = values;
         }
 
         public void AssingFeatureValue(int featureIndex, int value)
         {
             FeatureValues[featureIndex] = value;
+        }
+
+        public int GetLength()
+        {
+            return FeatureValues.Length;
         }
     }
 }

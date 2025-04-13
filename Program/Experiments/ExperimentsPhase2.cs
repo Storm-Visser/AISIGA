@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AISIGA.Program
+namespace AISIGA.Program.Experiments
 {
-    class Controller
+    class ExperimentsPhase2
     {
     }
 }

@@ -9,12 +9,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+	  <Content Include="Program\Data\Datasets\**\*">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <Page Include="App.xaml" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Program\AIS\VALIS\" />
-    <Folder Include="Program\Datasets\" />
   </ItemGroup>
 
 </Project>
