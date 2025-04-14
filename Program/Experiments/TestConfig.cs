@@ -9,7 +9,7 @@ namespace AISIGA.Program.Experiments
     class TestConfig : ExperimentConfig
     {
         public override int NumberOfGenerations => 10;
-        public override int PopulationSize => 10;
+        public override int PopulationSize => 12;
         public override int DataSetNr => 0; 
         public override double TrainingTestSplit => 0.8;
         public override int NumberOfIslands => 4;
@@ -28,5 +28,6 @@ namespace AISIGA.Program.Experiments
         public override bool UseHyperEllipsoids => false;
         public override bool UseUnboundedRegions => false;
         public override bool UseAffinityMaturationMutation => false;
+        public override double BaseRadius => 1.0;
     }
 }

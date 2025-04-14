@@ -1,6 +1,7 @@
 ﻿using AISIGA.Program.AIS;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -54,7 +55,7 @@ namespace AISIGA.Program.Data
                 {
                     featureValues = values
                         .Where((_, index) => index != labelIndex)
-                        .Select(double.Parse)
+                        .Select(v => double.Parse(v, CultureInfo.InvariantCulture))
                         .ToArray();
                 }
                 catch (FormatException ex)
@@ -70,5 +71,7 @@ namespace AISIGA.Program.Data
 
             return Antigens;
         }
+
+
     }
 }

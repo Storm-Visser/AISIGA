@@ -49,5 +49,12 @@ namespace AISIGA.Program.AIS
         {
             return FeatureValues.Length;
         }
+
+        public double GetFeatureValueAt(int index)
+        {
+            if (index < 0 || index >= FeatureValues.Length)
+                throw new ArgumentOutOfRangeException(nameof(index), "Index is out of range.");
+            return FeatureValues[index];
+        }
     }
 }

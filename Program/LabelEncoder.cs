@@ -23,6 +23,8 @@ namespace AISIGA.Program
             return _labelToInt[label];
         }
 
+        public static int ClassCount => _labelToInt.Count;
+
         public static string? Decode(int encoded)
         {
             return _intToLabel.TryGetValue(encoded, out string? value) ? value : null;

@@ -9,11 +9,11 @@ namespace AISIGA.Program.AIS
     class Antibody
     {
         private int Class { get; set; }
-        private int BaseRadius { get; set; }
+        private double BaseRadius { get; set; }
         private double[] FeatureValues { get; set; }
         private double[] FeatureMultipliers { get; set; }
 
-        public Antibody(int assignedClass, int baseRadius, int amountOfFeatures)
+        public Antibody(int assignedClass, double baseRadius, int amountOfFeatures)
         {
             Class = assignedClass;
             BaseRadius = baseRadius;
@@ -31,7 +31,7 @@ namespace AISIGA.Program.AIS
             Class = value;
         }
 
-        public int GetBaseRadius()
+        public double GetBaseRadius()
         {
             return BaseRadius;
         }
@@ -61,6 +61,13 @@ namespace AISIGA.Program.AIS
             FeatureMultipliers = values;
         }
 
+        public int GetLength()
+        {
+            return FeatureValues.Length;
+        }
+
+        
+
         public void AssignRandomFeatureValuesAndMultipliers(double[] MaxFeatureValues, double[] MinFeatureValues)
         {
             Random random = RandomProvider.GetThreadRandom();
@@ -69,6 +76,25 @@ namespace AISIGA.Program.AIS
                 FeatureValues[i] = random.NextDouble() * (MaxFeatureValues[i] - MinFeatureValues[i]) + MinFeatureValues[i];
                 FeatureMultipliers[i] = (random.NextDouble() * 1.9) + 0.1;
             }
+        }
+
+        public void AssingRandomClass()
+        {
+            this.Class = RandomProvider.GetThreadRandom().Next(0, LabelEncoder.ClassCount);
+        }
+
+        public double GetFeatureValueAt(int index)
+        {
+            if (index < 0 || index >= FeatureValues.Length)
+                throw new ArgumentOutOfRangeException(nameof(index), "Index is out of range.");
+            return FeatureValues[index];
+        }
+
+        public double GetFeatureMultiplierAt(int index)
+        {
+            if (index < 0 || index >= FeatureMultipliers.Length)
+                throw new ArgumentOutOfRangeException(nameof(index), "Index is out of range.");
+            return FeatureMultipliers[index];
         }
     }
 }
