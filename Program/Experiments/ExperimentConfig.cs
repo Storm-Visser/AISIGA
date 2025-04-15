@@ -15,7 +15,9 @@ namespace AISIGA.Program.Experiments
         public abstract int NumberOfIslands { get; }
 
         public abstract double MutationRate { get; }
+        public abstract double MutationFrequency { get; }
         public abstract double CrossoverRate { get; }
+        public abstract double CrossoverFrequency { get; }
         public abstract double MigrationRate { get; }
         public abstract double MigrationFrequency { get; }
 

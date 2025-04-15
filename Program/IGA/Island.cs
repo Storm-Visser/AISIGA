@@ -112,7 +112,7 @@ namespace AISIGA.Program.IGA
                 List<Antibody> CopiedMigrants = new List<Antibody>();
                 foreach (var antibody in ToMigrate)
                 {
-                    Antibody copy = new Antibody(antibody.GetClass(), antibody.GetBaseRadius(), antibody.GetFeatureValues(), antibody.GetFeatureMultipliers(), antibody.GetFitness());
+                    Antibody copy = new Antibody(antibody.GetClass(), antibody.GetBaseRadius(), antibody.GetFeatureValues(), antibody.GetFeatureMultipliers(), antibody.GetFitness(), true);
                     CopiedMigrants.Add(copy);
                 }
                 this.Neighbour.RecieveMigration(CopiedMigrants);

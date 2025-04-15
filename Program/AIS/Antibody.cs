@@ -24,13 +24,17 @@ namespace AISIGA.Program.AIS
             Fitness = new Fitness();
         }
 
-        public Antibody(int assignedClass, double baseRadius, double[] featureValues, double[] featureMultipliers, Fitness fitness) 
+        public Antibody(int assignedClass, double baseRadius, double[] featureValues, double[] featureMultipliers, Fitness fitness, bool IsCalculationStillValid) 
         {
             Class = assignedClass;
             BaseRadius = baseRadius;
-            FeatureValues = featureValues;
-            FeatureMultipliers = featureMultipliers;
-            Fitness = fitness;
+
+            // Deep copy the arrays
+            FeatureValues = (double[])featureValues.Clone();
+            FeatureMultipliers = (double[])featureMultipliers.Clone();
+
+            // Deep copy the fitness object (make sure Fitness has a copy constructor!)
+            Fitness = new Fitness(fitness, IsCalculationStillValid);
         }   
 
         public int GetClass()
@@ -48,7 +52,7 @@ namespace AISIGA.Program.AIS
             return BaseRadius;
         }
 
-        public void SetBaseRadius(int value)
+        public void SetBaseRadius(double value)
         {
             BaseRadius = value;
         }

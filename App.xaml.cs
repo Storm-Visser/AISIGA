@@ -1,5 +1,6 @@
 ﻿using AISIGA.Program;
 using AISIGA.Program.Experiments;
+using AISIGA.Program.Tests;
 using System.Configuration;
 using System.Data;
 using System.Windows;
@@ -18,11 +19,8 @@ public partial class App : Application
         base.OnStartup(e);
         #if DEBUG
                 // Run your test class here
-                var test = new MutationCrossoverTests();
-                test.Run();
-
-                Console.WriteLine("Press any key to start default program");
-                Console.ReadKey(); // Pause so you can read output
+                Tests.Run();
+                System.Diagnostics.Trace.WriteLine("Done With Tests, Now starting program");
         #endif
         // Initialize the experiment configuration & the controller
         ExperimentConfig expConfig = new TestConfig();

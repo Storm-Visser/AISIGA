@@ -28,6 +28,17 @@ namespace AISIGA.Program.IGA
             InvalidAvidity = 0;
         }
 
+        public Fitness(Fitness fitness, bool IsCalculationStillValid)
+        {
+            IsCalculated = IsCalculationStillValid;
+            TotalFitness = fitness.TotalFitness;
+            Correctness = fitness.Correctness;
+            Coverage = fitness.Coverage;
+            Uniqueness = fitness.Uniqueness;
+            ValidAvidity = fitness.ValidAvidity;
+            InvalidAvidity = fitness.InvalidAvidity;
+        }
+
         public double GetTotalFitness()
         {
             if (!IsCalculated)
