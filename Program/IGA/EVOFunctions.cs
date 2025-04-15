@@ -11,14 +11,14 @@ namespace AISIGA.Program.IGA
     {
         public static Antibody MutateAntibody(Antibody antibody)
         {
-            //todo: Implement mutation logic
+            //todo: Implement mutation logic, can be the same antibody
 
             return antibody;
         }
 
         public static (Antibody Child1, Antibody Child2) CrossoverAntibodies(Antibody Parent1, Antibody Parent2)
         {
-            //todo: Implement crossover logic
+            //todo: Implement crossover logic Make suure they are NEW antibodies
 
             return (Parent1, Parent2);
         }

@@ -122,5 +122,38 @@ namespace AISIGA.Program.IGA
                 Console.WriteLine("No neighbour to migrate to.");
             }
         }
+
+        public void RunGeneration()
+        {
+            SortByFitness();
+            // Select the best antibodies
+            int AmountToCrossover = (int)(Config.MigrationRate * Config.PopulationSize);
+            List<Antibody> selectedAntibodies = Antibodies.Take(Config.PopulationSize).ToList();
+            for (int i = 0; i < AmountToCrossover; i += 2)
+            {
+                // Perform crossover
+                Antibody parent1 = selectedAntibodies[i];
+                Antibody parent2 = selectedAntibodies[i + 1];
+                (Antibody child1, Antibody child2) = EVOFunctions.CrossoverAntibodies(parent1, parent2);
+
+                // Mutate the children
+                if (RandomProvider.GetThreadRandom().NextDouble() < Config.MutationRate)
+                {
+                    child1 = EVOFunctions.MutateAntibody(child1);
+                }
+                if (RandomProvider.GetThreadRandom().NextDouble() < Config.MutationRate)
+                {
+                    child1 = EVOFunctions.MutateAntibody(child1);
+                }
+
+                // Add the children back to the population
+                Antibodies.Add(child1);
+                Antibodies.Add(child2);
+            }
+            // Sort the antibodies by fitness
+            SortByFitness();
+            // Remove the excess antibodies
+            this.Antibodies = this.Antibodies.Take(Config.PopulationSize).ToList();
+        }
     }
 }
