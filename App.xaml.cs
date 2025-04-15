@@ -16,6 +16,14 @@ public partial class App : Application
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        #if DEBUG
+                // Run your test class here
+                var test = new MutationCrossoverTests();
+                test.Run();
+
+                Console.WriteLine("Press any key to start default program");
+                Console.ReadKey(); // Pause so you can read output
+        #endif
         // Initialize the experiment configuration & the controller
         ExperimentConfig expConfig = new TestConfig();
         Master master = new Master(expConfig);
