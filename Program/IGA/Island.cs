@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,7 +15,6 @@ namespace AISIGA.Program.IGA
         private ExperimentConfig Config { get; set; }
         private List<AIS.Antigen> Antigens { get; set; }
         private List<AIS.Antibody> Antibodies { get; set; }
-
         private Island? Neighbour { get; set; }
 
         public Island(ExperimentConfig config)
@@ -80,6 +80,46 @@ namespace AISIGA.Program.IGA
             {
                 antibody.AssignRandomFeatureValuesAndMultipliers(maxValues, minValues);
                 antibody.AssingRandomClass();
+            }
+        }
+
+        private void SortByFitness()
+        {
+            // Sort the antibodies by fitness
+            Antibodies = Antibodies
+            .OrderByDescending(a => a.GetFitness().GetTotalFitness())
+            .ToList();
+        }
+
+        public void RecieveMigration(List<Antibody> migrants)
+        {
+            // Add migrants
+            this.Antibodies.AddRange(migrants);
+            // Sort the antibodies by fitness
+            SortByFitness();
+            // Remove the excess antibodies
+            this.Antibodies = this.Antibodies.Take(Config.PopulationSize).ToList();
+
+        }
+
+        public void Migrate()
+        {
+            if (this.Neighbour != null)
+            {
+                int AmountToMigrate = (int)(Config.MigrationRate * Config.PopulationSize);
+                List<Antibody> ToMigrate = new List<Antibody>();
+                ToMigrate.AddRange(Antibodies.Take(AmountToMigrate));
+                List<Antibody> CopiedMigrants = new List<Antibody>();
+                foreach (var antibody in ToMigrate)
+                {
+                    Antibody copy = new Antibody(antibody.GetClass(), antibody.GetBaseRadius(), antibody.GetFeatureValues(), antibody.GetFeatureMultipliers(), antibody.GetFitness());
+                    CopiedMigrants.Add(copy);
+                }
+                this.Neighbour.RecieveMigration(CopiedMigrants);
+            }
+            else
+            {
+                Console.WriteLine("No neighbour to migrate to.");
             }
         }
     }

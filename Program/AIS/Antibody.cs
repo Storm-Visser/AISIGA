@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AISIGA.Program.IGA;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,7 @@ namespace AISIGA.Program.AIS
         private double BaseRadius { get; set; }
         private double[] FeatureValues { get; set; }
         private double[] FeatureMultipliers { get; set; }
+        private Fitness Fitness { get; set; }
 
         public Antibody(int assignedClass, double baseRadius, int amountOfFeatures)
         {
@@ -19,7 +21,17 @@ namespace AISIGA.Program.AIS
             BaseRadius = baseRadius;
             FeatureValues = new double[amountOfFeatures];
             FeatureMultipliers = new double[amountOfFeatures];
+            Fitness = new Fitness();
         }
+
+        public Antibody(int assignedClass, double baseRadius, double[] featureValues, double[] featureMultipliers, Fitness fitness) 
+        {
+            Class = assignedClass;
+            BaseRadius = baseRadius;
+            FeatureValues = featureValues;
+            FeatureMultipliers = featureMultipliers;
+            Fitness = fitness;
+        }   
 
         public int GetClass()
         {
@@ -66,7 +78,11 @@ namespace AISIGA.Program.AIS
             return FeatureValues.Length;
         }
 
-        
+        public Fitness GetFitness()
+        {
+            return Fitness;
+        }
+
 
         public void AssignRandomFeatureValuesAndMultipliers(double[] MaxFeatureValues, double[] MinFeatureValues)
         {

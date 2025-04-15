@@ -26,7 +26,7 @@ namespace AISIGA.Program
             Islands = new List<Island>();
             Antigens = new List<AIS.Antigen>();
             Antibodies = new List<AIS.Antibody>();
-            //Initialize();
+            Initialize();
         }
 
         public void Initialize()
@@ -96,6 +96,51 @@ namespace AISIGA.Program
             {
                 island.InitializeAntibodies();
             }
+        }
+
+        public void StartExperiment()
+        {
+            int islandCount = Islands.Count;
+
+            Barrier barrier = new Barrier(islandCount, (b) =>
+            {
+                // This code runs ONCE after all threads hit the barrier
+                foreach (var island in Islands)
+                {
+                    //island.Migrate(Islands); // Shared migration logic
+                }
+            });
+
+            List<Task> islandTasks = new List<Task>();
+            foreach (var island in Islands)
+            {
+                var task = Task.Run(() =>
+                {
+                    for (int gen = 0; gen < Config.NumberOfGenerations; gen++)
+                    {
+                        //island.RunGenerations(1); // Run 1 generation
+
+                        if ((gen + 1) % Config.MigrationFrequency == 0)
+                        {
+                            barrier.SignalAndWait(); // Wait for others
+                        }
+                    }
+                });
+
+                islandTasks.Add(task);
+            }
+
+            Task.WaitAll(islandTasks.ToArray());
+
+            //Done Threading
+            CollectResults();
+
+        }
+
+        private void CollectResults()
+        {
+
+            Console.WriteLine("done");
         }
     }
 }
