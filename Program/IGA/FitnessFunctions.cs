@@ -3,114 +3,13 @@ using AISIGA.Program.Experiments;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace AISIGA.Program.IGA
 {
-    class Fitness
-    {
-        private bool IsCalculated { get; set; }
-        private double TotalFitness { get; set; }
-        private double Correctness { get; set; }
-        private double Coverage { get; set; }
-        private double Uniqueness { get; set; }
-        private double ValidAvidity { get; set; }
-        private double InvalidAvidity { get; set; }
-
-        public Fitness()
-        {
-            IsCalculated = false;
-            TotalFitness = 0;
-            Correctness = 0;
-            Coverage = 0;
-            Uniqueness = 0;
-            ValidAvidity = 0;
-            InvalidAvidity = 0;
-        }
-
-        public Fitness(Fitness fitness, bool IsCalculationStillValid)
-        {
-            IsCalculated = IsCalculationStillValid;
-            TotalFitness = fitness.TotalFitness;
-            Correctness = fitness.Correctness;
-            Coverage = fitness.Coverage;
-            Uniqueness = fitness.Uniqueness;
-            ValidAvidity = fitness.ValidAvidity;
-            InvalidAvidity = fitness.InvalidAvidity;
-        }
-
-        public bool GetIsCalculated()
-        {
-            return IsCalculated;
-        }
-
-        public void SetIsCalculated(bool isCalculated)
-        {
-            IsCalculated = isCalculated;
-        }
-
-        public double GetTotalFitness()
-        {
-            return TotalFitness;
-        }
-
-        public void SetTotalFitness(double totalFitness)
-        {
-            TotalFitness = totalFitness;
-        }
-
-        public double GetCorrectness()
-        {
-            return Correctness;
-        }
-
-        public void SetCorrectness(double correctness)
-        {
-            Correctness = correctness;
-        }
-
-        public double GetCoverage()
-        {
-            return Coverage;
-        }
-
-        public void SetCoverage(double coverage)
-        {
-            Coverage = coverage;
-        }
-
-        public double GetUniqueness()
-        {
-            return Uniqueness;
-        }
-
-        public void SetUniqueness(double uniqueness)
-        {
-            Uniqueness = uniqueness;
-        }
-
-        public double GetValidAvidity()
-        {
-            return ValidAvidity;
-        }
-
-        public void SetValidAvidity(double validAvidity)
-        {
-            ValidAvidity = validAvidity;
-        }
-
-        public double GetInvalidAvidity()
-        {
-            return InvalidAvidity;
-        }
-
-        public void SetInvalidAvidity(double invalidAvidity)
-        {
-            InvalidAvidity = invalidAvidity;
-        }
-    }
     static class FitnessFunctions
     {
         public static ExperimentConfig ?Config { get; set; }
@@ -131,25 +30,67 @@ namespace AISIGA.Program.IGA
 
 
 
-        public static double CalculateAvidity()
+        public static double CalculateAvidity(List<Antigen> matchedAntigens, double[] matchScores)
         {
-            return 0.0;
+            double totalAvidity = 0.0;
+            int matchedCount = 0;
+            for (int i = 0; i < matchedAntigens.Count; i++)
+            {
+                Antigen AG = matchedAntigens[i];
+                if (AG.GetAssignedClass() == AG.GetActualClass())
+                {
+                    totalAvidity += Sigmoid(matchScores[i]);
+                    matchedCount++;
+                }
+            }
+            return totalAvidity / matchedCount;
         }
 
-        public static double CalculateInvalidAvidity()
+        public static double CalculateInvalidAvidity(List<Antigen> matchedAntigens, double[] matchScores)
         {
-            return 0.0;
+            double totalAvidity = 0.0;
+            int matchedCount = 0;
+            for (int i = 0; i < matchedAntigens.Count; i++)
+            {
+                Antigen AG = matchedAntigens[i];
+                if (AG.GetAssignedClass() != AG.GetActualClass())
+                {
+                    totalAvidity += Sigmoid(matchScores[i]);
+                    matchedCount++;
+                }
+            }
+            return totalAvidity / matchedCount;
         }
 
 
         private static double CalculateSharedAffinity(List<Antibody> antibodies, List<Antigen> matchedAntigens)
         {
             double sharedAffinity = 0.0;
+            foreach (Antigen AG in matchedAntigens)
+            {
+                double sharedCount = 0.0;
+                // Loop through all antibodies
+                foreach (Antibody AB in antibodies)
+                {
+                    // Check if the antibody matches the antigen
+                    double distance = IsAntigenMatched(AB, AG);
+                    if (distance <= 0)
+                    {
+                        sharedCount++;
+                    }
+                }
+                sharedAffinity += 1/ sharedCount;
+            }
             
             return sharedAffinity;
         }
 
-        private static bool IsAntigenMatched(Antibody antibody, Antigen antigen)
+        private static double Sigmoid(double x)
+        {
+            return 1 - (1 / (1 + Math.Exp(-x)));
+        }
+
+        private static double IsAntigenMatched(Antibody antibody, Antigen antigen)
         {
             if (Config == null)
             {
@@ -164,8 +105,8 @@ namespace AISIGA.Program.IGA
                 
                 if (Config.UseUnboundedRegions)
                 {
-                    //If we use UBR, we need to check if thsi specific dim is a unbounded
-                    if (true)
+                    //If we use UBR, we need to check if this specific dim is a unbounded
+                    if (antibody.GetFeatureDimTypes()[i] == 1 )
                     {
                         // If so, we calculate the distance without squaring it
                         distance += (antigen.GetFeatureValueAt(i) - antibody.GetFeatureValueAt(i)) * antibody.GetFeatureMultipliers()[i];
@@ -181,15 +122,52 @@ namespace AISIGA.Program.IGA
             // Then we substract the base radius of the AB
             distance -= antibody.GetBaseRadius();
             // If the total is smaller than or equal to 0, we have a match
-            return distance <= 0;
+            return distance;
         }
 
-        public static double GetMatchedAntigens(Antibody antibody, List<Antigen> antigens)
+        public static (List<Antigen>, double[]) GetMatchedAntigens(Antibody antibody, List<Antigen> antigens)
         {
+            List <Antigen> matchedAntigens = new List<Antigen>();
+            double[] matchScores = new double[antigens.Count];
 
+            for (int i = 0; i < antigens.Count; i++)
+            {
+                Antigen antigen = antigens[i];
+                double distance = IsAntigenMatched(antibody, antigen);
+                if (distance <= 0)
+                {
+                    matchedAntigens.Add(antigen);
+                    matchScores[i] = distance;
+                }
+            }
 
-            return 0.0;
+            return (matchedAntigens, matchScores);
         }
 
+        public static double CalcTruePositives(Antibody antibody, List <Antigen> matchedAntigens)
+        {
+            double truePositives = 0;
+            foreach (Antigen AG in matchedAntigens)
+            {
+                if (antibody.GetClass() == AG.GetActualClass())
+                {
+                    truePositives++;
+                }
+            }
+            return truePositives;
+        }
+
+        public static double CalcFalsePositives(Antibody antibody, List<Antigen> matchedAntigens)
+        {
+            double falsePositives = 0;
+            foreach (Antigen AG in matchedAntigens)
+            {
+                if (antibody.GetClass() != AG.GetActualClass())
+                {
+                    falsePositives++;
+                }
+            }
+            return falsePositives;
+        }
     }
 }

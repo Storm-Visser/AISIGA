@@ -24,6 +24,11 @@ namespace AISIGA.Program.AIS
             return AssingedClass;
         }
 
+        public void SetAssignedClass(int value)
+        {
+            AssingedClass = value;
+        }
+
         public int GetActualClass()
         {
             return ActualClass;

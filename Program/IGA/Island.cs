@@ -79,7 +79,7 @@ namespace AISIGA.Program.IGA
             // Create antibodies based on the min and max values
             foreach (Antibody antibody in Antibodies)
             {
-                antibody.AssignRandomFeatureValuesAndMultipliers(maxValues, minValues);
+                antibody.AssignRandomFeatureValuesAndMultipliers(maxValues, minValues, Config.UseHyperSpheres);
                 antibody.AssingRandomClass();
             }
         }
@@ -88,7 +88,7 @@ namespace AISIGA.Program.IGA
         {
             // Sort the antibodies by fitness
             Antibodies = Antibodies
-            .OrderByDescending(a => a.GetFitness().GetTotalFitness(a))
+            .OrderByDescending(a => CalculateAntibodyFitness(a, Antibodies, Antigens))
             .ToList();
         }
 
@@ -113,7 +113,7 @@ namespace AISIGA.Program.IGA
                 List<Antibody> CopiedMigrants = new List<Antibody>();
                 foreach (var antibody in ToMigrate)
                 {
-                    Antibody copy = new Antibody(antibody.GetClass(), antibody.GetBaseRadius(), antibody.GetFeatureValues(), antibody.GetFeatureMultipliers(), antibody.GetFitness(), true);
+                    Antibody copy = new Antibody(antibody.GetClass(), antibody.GetBaseRadius(), antibody.GetFeatureValues(), antibody.GetFeatureMultipliers(), antibody.GetFeatureDimTypes(), antibody.GetFitness(), true);
                     CopiedMigrants.Add(copy);
                 }
                 this.Neighbour.RecieveMigration(CopiedMigrants);
@@ -166,17 +166,17 @@ namespace AISIGA.Program.IGA
             }
             else 
             {
-                List<Antigen> matchedAntigens = new List<Antigen>();
-                double TruePositives = 0;
-                double FalsePositives = 0;
+                (List<Antigen> matchedAntigens, double[] matchScores) = FitnessFunctions.GetMatchedAntigens(antibody, allAntigens);
+                double TruePositives = FitnessFunctions.CalcTruePositives(antibody, matchedAntigens);
+                double FalsePositives = FitnessFunctions.CalcFalsePositives(antibody, matchedAntigens); ;
                 double AllPositivesOfSameClass = 0;
                 
 
                 antibody.GetFitness().SetCorrectness(FitnessFunctions.CalculateCorrectness(TruePositives, FalsePositives));
                 antibody.GetFitness().SetCoverage(FitnessFunctions.CalculateCoverage(TruePositives, AllPositivesOfSameClass));
                 antibody.GetFitness().SetUniqueness(FitnessFunctions.CalculateUniqueness(TruePositives, allAntibodies, matchedAntigens));
-                antibody.GetFitness().SetValidAvidity(FitnessFunctions.CalculateAvidity());
-                antibody.GetFitness().SetInvalidAvidity(FitnessFunctions.CalculateInvalidAvidity());
+                antibody.GetFitness().SetValidAvidity(FitnessFunctions.CalculateAvidity(matchedAntigens, matchScores));
+                antibody.GetFitness().SetInvalidAvidity(FitnessFunctions.CalculateInvalidAvidity(matchedAntigens, matchScores));
                 antibody.GetFitness().SetTotalFitness(antibody.GetFitness().GetCorrectness() * Config.aScoreMultiplier 
                     + antibody.GetFitness().GetCoverage() * Config.bScoreMultiplier
                     + antibody.GetFitness().GetUniqueness() * Config.cScoreMultiplier

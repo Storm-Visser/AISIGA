@@ -18,7 +18,7 @@ namespace AISIGA.Program.Tests.MethodTests
             LabelEncoder.Encode("b");
             LabelEncoder.Encode("c");
             Antibody testAB = new Antibody(0,1,3);
-            testAB.AssignRandomFeatureValuesAndMultipliers([2.0, 2.0, 2.0], [-2.0, -2.0, -2.0]);
+            testAB.AssignRandomFeatureValuesAndMultipliers([2.0, 2.0, 2.0], [-2.0, -2.0, -2.0], config.UseHyperSpheres);
             testAB.AssingRandomClass();
 
             System.Diagnostics.Debug.WriteLine("TestAB Before: ");

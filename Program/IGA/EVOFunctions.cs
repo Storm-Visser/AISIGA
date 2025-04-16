@@ -50,18 +50,41 @@ namespace AISIGA.Program.IGA
                 }
             }
 
-
-            //Mutate feature multipliers
-            double[] featureMultipliers = antibody.GetFeatureMultipliers();
-            for (int i = 0; i < featureMultipliers.Length; i++)
+            if (Config.UseHyperEllipsoids || Config.UseUnboundedRegions)
             {
-                if (RandomProvider.GetThreadRandom().NextDouble() < Config.MutationFrequency)
+                //Mutate feature multipliers
+                double[] featureMultipliers = antibody.GetFeatureMultipliers();
+                for (int i = 0; i < featureMultipliers.Length; i++)
                 {
-                    // Mutate the values with a number between 0.1 and 2
-                    double mutation = (RandomProvider.GetThreadRandom().NextDouble() * 1.9) + 0.1;
-                    featureMultipliers[i] *= mutation;
+                    if (RandomProvider.GetThreadRandom().NextDouble() < Config.MutationFrequency)
+                    {
+                        // Mutate the values with a number between 0.1 and 2
+                        double mutation = (RandomProvider.GetThreadRandom().NextDouble() * 1.9) + 0.1;
+                        featureMultipliers[i] *= mutation;
+                    }
                 }
             }
+
+            if (Config.UseUnboundedRegions)
+            {
+                //Mutate feature dim types
+                int[] featureDimTypes = antibody.GetFeatureDimTypes();
+                for (int i = 0; i < featureDimTypes.Length; i++)
+                {
+                    if (RandomProvider.GetThreadRandom().NextDouble() < Config.MutationFrequency)
+                    {
+                        if (featureDimTypes[i] == 0)
+                        {
+                            featureDimTypes[i] = 1;
+                        }
+                        else
+                        {
+                            featureDimTypes[i] = 0;
+                        }
+                    }
+                }
+            }
+            antibody.GetFitness().SetIsCalculated(false);
             return antibody;
         }
 
@@ -119,24 +142,45 @@ namespace AISIGA.Program.IGA
                 }
             }
 
-
-            //Select feature multipliers
-            double[] featureMultipliers = Parent1.GetFeatureMultipliers();
-            for (int i = 0; i < featureMultipliers.Length; i++)
+            if (Config.UseHyperEllipsoids || Config.UseUnboundedRegions)
             {
-                if (RandomProvider.GetThreadRandom().NextDouble() < Config.CrossoverFrequency)
+                //Select feature multipliers
+                double[] featureMultipliers = Parent1.GetFeatureMultipliers();
+                for (int i = 0; i < featureMultipliers.Length; i++)
                 {
-                    child1.GetFeatureMultipliers()[i] = Parent2.GetFeatureMultipliers()[i];
-                    child2.GetFeatureMultipliers()[i] = Parent1.GetFeatureMultipliers()[i];
-                }
-                else
-                {
-                    child1.GetFeatureMultipliers()[i] = Parent1.GetFeatureMultipliers()[i];
-                    child2.GetFeatureMultipliers()[i] = Parent2.GetFeatureMultipliers()[i];
+                    if (RandomProvider.GetThreadRandom().NextDouble() < Config.CrossoverFrequency)
+                    {
+                        child1.GetFeatureMultipliers()[i] = Parent2.GetFeatureMultipliers()[i];
+                        child2.GetFeatureMultipliers()[i] = Parent1.GetFeatureMultipliers()[i];
+                    }
+                    else
+                    {
+                        child1.GetFeatureMultipliers()[i] = Parent1.GetFeatureMultipliers()[i];
+                        child2.GetFeatureMultipliers()[i] = Parent2.GetFeatureMultipliers()[i];
+                    }
                 }
             }
 
+            if (Config.UseUnboundedRegions)
+            {
+                //Select feature multipliers
+                int[] featureDimTypes = Parent1.GetFeatureDimTypes();
+                for (int i = 0; i < featureDimTypes.Length; i++)
+                {
+                    if (RandomProvider.GetThreadRandom().NextDouble() < Config.CrossoverFrequency)
+                    {
+                        child1.GetFeatureDimTypes()[i] = Parent2.GetFeatureDimTypes()[i];
+                        child2.GetFeatureDimTypes()[i] = Parent1.GetFeatureDimTypes()[i];
+                    }
+                    else
+                    {
+                        child1.GetFeatureDimTypes()[i] = Parent1.GetFeatureDimTypes()[i];
+                        child2.GetFeatureDimTypes()[i] = Parent2.GetFeatureDimTypes()[i];
+                    }
+                }
+            }
 
+            
             return (child1, child2);
         }
     }

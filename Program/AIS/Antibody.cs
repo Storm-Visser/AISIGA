@@ -13,6 +13,7 @@ namespace AISIGA.Program.AIS
         private double BaseRadius { get; set; }
         private double[] FeatureValues { get; set; }
         private double[] FeatureMultipliers { get; set; }
+        private int[] FeatureDimTypes { get; set; }
         private Fitness Fitness { get; set; }
 
         public Antibody(int assignedClass, double baseRadius, int amountOfFeatures)
@@ -21,10 +22,11 @@ namespace AISIGA.Program.AIS
             BaseRadius = baseRadius;
             FeatureValues = new double[amountOfFeatures];
             FeatureMultipliers = new double[amountOfFeatures];
+            FeatureDimTypes = new int[amountOfFeatures];
             Fitness = new Fitness();
         }
 
-        public Antibody(int assignedClass, double baseRadius, double[] featureValues, double[] featureMultipliers, Fitness fitness, bool IsCalculationStillValid) 
+        public Antibody(int assignedClass, double baseRadius, double[] featureValues, double[] featureMultipliers, int[] featureDimTypes, Fitness fitness, bool IsCalculationStillValid) 
         {
             Class = assignedClass;
             BaseRadius = baseRadius;
@@ -32,6 +34,7 @@ namespace AISIGA.Program.AIS
             // Deep copy the arrays
             FeatureValues = (double[])featureValues.Clone();
             FeatureMultipliers = (double[])featureMultipliers.Clone();
+            FeatureDimTypes = (int[])featureDimTypes.Clone();
 
             // Deep copy the fitness object (make sure Fitness has a copy constructor!)
             Fitness = new Fitness(fitness, IsCalculationStillValid);
@@ -77,6 +80,16 @@ namespace AISIGA.Program.AIS
             FeatureMultipliers = values;
         }
 
+        public int[] GetFeatureDimTypes()
+        {
+            return FeatureDimTypes;
+        }
+
+        public void SetFeatureDimTypes(int[] values)
+        {
+            FeatureDimTypes = values;
+        }
+
         public int GetLength()
         {
             return FeatureValues.Length;
@@ -88,13 +101,21 @@ namespace AISIGA.Program.AIS
         }
 
 
-        public void AssignRandomFeatureValuesAndMultipliers(double[] MaxFeatureValues, double[] MinFeatureValues)
+        public void AssignRandomFeatureValuesAndMultipliers(double[] MaxFeatureValues, double[] MinFeatureValues, bool useHyperSpheres)
         {
             Random random = RandomProvider.GetThreadRandom();
             for (int i = 0; i < FeatureValues.Length; i++)
             {
                 FeatureValues[i] = random.NextDouble() * (MaxFeatureValues[i] - MinFeatureValues[i]) + MinFeatureValues[i];
-                FeatureMultipliers[i] = (random.NextDouble() * 1.9) + 0.1;
+                if (useHyperSpheres)
+                {
+                    FeatureMultipliers[i] = 1.0;
+                }
+                else
+                {
+                    FeatureMultipliers[i] = (random.NextDouble() * 1.9) + 0.1;
+                }
+                FeatureDimTypes[i] = random.Next(0, 2);
             }
         }
 
@@ -115,6 +136,13 @@ namespace AISIGA.Program.AIS
             if (index < 0 || index >= FeatureMultipliers.Length)
                 throw new ArgumentOutOfRangeException(nameof(index), "Index is out of range.");
             return FeatureMultipliers[index];
+        }
+
+        public double GetFeatureDimTypeAt(int index)
+        {
+            if (index < 0 || index >= FeatureDimTypes.Length)
+                throw new ArgumentOutOfRangeException(nameof(index), "Index is out of range.");
+            return FeatureDimTypes[index];
         }
     }
 }
