@@ -2,6 +2,7 @@
 using AISIGA.Program.Experiments;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -87,7 +88,7 @@ namespace AISIGA.Program.IGA
         {
             // Sort the antibodies by fitness
             Antibodies = Antibodies
-            .OrderByDescending(a => a.GetFitness().GetTotalFitness())
+            .OrderByDescending(a => a.GetFitness().GetTotalFitness(a))
             .ToList();
         }
 
@@ -155,5 +156,37 @@ namespace AISIGA.Program.IGA
             // Remove the excess antibodies
             this.Antibodies = this.Antibodies.Take(Config.PopulationSize).ToList();
         }
+
+
+        private double CalculateAntibodyFitness(Antibody antibody, List<Antibody> allAntibodies, List<Antigen> allAntigens)
+        {
+            if (antibody.GetFitness().GetIsCalculated())
+            {
+                return antibody.GetFitness().GetTotalFitness();
+            }
+            else 
+            {
+                List<Antigen> matchedAntigens = new List<Antigen>();
+                double TruePositives = 0;
+                double FalsePositives = 0;
+                double AllPositivesOfSameClass = 0;
+                
+
+                antibody.GetFitness().SetCorrectness(FitnessFunctions.CalculateCorrectness(TruePositives, FalsePositives));
+                antibody.GetFitness().SetCoverage(FitnessFunctions.CalculateCoverage(TruePositives, AllPositivesOfSameClass));
+                antibody.GetFitness().SetUniqueness(FitnessFunctions.CalculateUniqueness(TruePositives, allAntibodies, matchedAntigens));
+                antibody.GetFitness().SetValidAvidity(FitnessFunctions.CalculateAvidity());
+                antibody.GetFitness().SetInvalidAvidity(FitnessFunctions.CalculateInvalidAvidity());
+                antibody.GetFitness().SetTotalFitness(antibody.GetFitness().GetCorrectness() * Config.aScoreMultiplier 
+                    + antibody.GetFitness().GetCoverage() * Config.bScoreMultiplier
+                    + antibody.GetFitness().GetUniqueness() * Config.cScoreMultiplier
+                    + antibody.GetFitness().GetValidAvidity() * Config.dScoreMultiplier
+                    + antibody.GetFitness().GetInvalidAvidity() * Config.eScoreMultiplier);
+                antibody.GetFitness().SetIsCalculated(true);
+                return antibody.GetFitness().GetTotalFitness();
+
+            }
+        }
+
     }
 }

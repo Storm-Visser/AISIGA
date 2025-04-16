@@ -25,6 +25,7 @@ namespace AISIGA.Program.Experiments
         public abstract double bScoreMultiplier { get; }
         public abstract double cScoreMultiplier { get; }
         public abstract double dScoreMultiplier { get; }
+        public abstract double eScoreMultiplier { get; }
 
         public abstract bool UseHyperSpheres { get; }
         public abstract bool UseHyperEllipsoids { get; }

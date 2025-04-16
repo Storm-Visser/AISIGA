@@ -25,6 +25,7 @@ namespace AISIGA.Program.Experiments
         public override double bScoreMultiplier => 1.0;
         public override double cScoreMultiplier => 1.0;
         public override double dScoreMultiplier => 1.0;
+        public override double eScoreMultiplier => 1.0;
 
         public override bool UseHyperSpheres => true;
         public override bool UseHyperEllipsoids => false;
