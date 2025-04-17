@@ -73,15 +73,19 @@ namespace AISIGA.Program.IGA
                 {
                     if (RandomProvider.GetThreadRandom().NextDouble() < Config.MutationFrequency)
                     {
-                        if (featureDimTypes[i] == 0)
-                        {
-                            featureDimTypes[i] = 1;
+                        switch(featureDimTypes[i]) {
+                            case 0:
+                                featureDimTypes[i] = RandomProvider.GetThreadRandom().Next(1,3);
+                                break;
+                            case 1:
+                                featureDimTypes[i] = RandomProvider.GetThreadRandom().Next(0, 2) * 2;
+                                break;
+                            case 2:
+                                featureDimTypes[i] = RandomProvider.GetThreadRandom().Next(0, 2);
+                                break;
+                            default:
+                                throw new Exception("Invalid feature dim type");
                         }
-                        else
-                        {
-                            featureDimTypes[i] = 0;
-                        }
-                    }
                 }
             }
             antibody.GetFitness().SetIsCalculated(false);

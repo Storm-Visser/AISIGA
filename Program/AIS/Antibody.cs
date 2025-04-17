@@ -103,19 +103,18 @@ namespace AISIGA.Program.AIS
 
         public void AssignRandomFeatureValuesAndMultipliers(double[] MaxFeatureValues, double[] MinFeatureValues, bool useHyperSpheres)
         {
-            Random random = RandomProvider.GetThreadRandom();
             for (int i = 0; i < FeatureValues.Length; i++)
             {
-                FeatureValues[i] = random.NextDouble() * (MaxFeatureValues[i] - MinFeatureValues[i]) + MinFeatureValues[i];
+                FeatureValues[i] = RandomProvider.GetThreadRandom().NextDouble() * (MaxFeatureValues[i] - MinFeatureValues[i]) + MinFeatureValues[i];
                 if (useHyperSpheres)
                 {
                     FeatureMultipliers[i] = 1.0;
                 }
                 else
                 {
-                    FeatureMultipliers[i] = (random.NextDouble() * 1.9) + 0.1;
+                    FeatureMultipliers[i] = (RandomProvider.GetThreadRandom().NextDouble() * 1.9) + 0.1;
                 }
-                FeatureDimTypes[i] = random.Next(0, 2);
+                FeatureDimTypes[i] = RandomProvider.GetThreadRandom().Next(0, 3);
             }
         }
 
