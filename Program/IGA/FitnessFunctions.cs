@@ -121,6 +121,10 @@ namespace AISIGA.Program.IGA
          * 
          * In order to allow the AB's to "change direction" to detect anything thats larger, a GetFeatureDimTypes()[x]
          * value of 2 will swith the AB and AG around the -, having the opposite effect
+         * 
+         * -----NOTE-----
+         * This behavior works for the larger than or smaller than radius calculation, 
+         * but is a bit weird for actual distance for unbounded regions, beware when using that directly
          */
         public static double CalcAGtoABDistance(Antibody antibody, Antigen antigen)
         {
