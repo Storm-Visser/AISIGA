@@ -2,6 +2,7 @@
 using AISIGA.Program.Experiments;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -140,6 +141,14 @@ namespace AISIGA.Program.IGA
                     // If so, we calculate the distance without squaring it
                     distance += (antigen.GetFeatureValueAt(i) - antibody.GetFeatureValueAt(i)) / antibody.GetFeatureMultipliers()[i];
                     
+                }
+                else if (Config.UseUnboundedRegions && antibody.GetFeatureDimTypes()[i] == 2)
+                {
+                    //If we use UBR, we need to check if this specific dim is a unbounded
+                    // If so, we calculate the distance without squaring it
+                    // but swith the AB and AG around the - to change direction of the unbounded part
+                    distance += (antibody.GetFeatureValueAt(i) - antigen.GetFeatureValueAt(i)) / antibody.GetFeatureMultipliers()[i];
+
                 }
                 else
                 {
