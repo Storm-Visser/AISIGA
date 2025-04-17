@@ -13,6 +13,7 @@ namespace AISIGA.Program.Tests
         { 
             CrossoverTest.TestCrossover();
             MutationTest.TestMutation();
+            DetectionOfAGByABTest.TestAGDetection();
         }
 
     }

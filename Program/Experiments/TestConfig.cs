@@ -28,8 +28,8 @@ namespace AISIGA.Program.Experiments
         public override double eScoreMultiplier => 1.0;
 
         public override bool UseHyperSpheres => true;
-        public override bool UseHyperEllipsoids => false;
-        public override bool UseUnboundedRegions => false;
+        public override bool UseHyperEllipsoids => true;
+        public override bool UseUnboundedRegions => true;
         public override bool UseAffinityMaturationMutation => false;
         public override double BaseRadius => 1.0;
     }

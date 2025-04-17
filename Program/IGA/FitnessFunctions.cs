@@ -73,7 +73,7 @@ namespace AISIGA.Program.IGA
                 foreach (Antibody AB in antibodies)
                 {
                     // Check if the antibody matches the antigen
-                    double distance = IsAntigenMatched(AB, AG);
+                    double distance = CalcAGtoABDistance(AB, AG);
                     if (distance <= 0)
                     {
                         sharedCount++;
@@ -90,7 +90,38 @@ namespace AISIGA.Program.IGA
             return 1 - (1 / (1 + Math.Exp(-x)));
         }
 
-        private static double IsAntigenMatched(Antibody antibody, Antigen antigen)
+
+        /*
+         * This function is a bit complicated, so ill try to explain.
+         * We keep track of the total distance in each dimension. In case of 2d, the x distance and the y distance
+         * So we have to loop through each dim.
+         * Ill explain witha an example based on the dim type
+         * 
+         * ----Normal case (HS & HE)----
+         * In a normal case, we simply add the distance per dim from the center, scaled with the multiplier. 
+         * So assume a AB at (0,0) with a radius of 1 and a multiplier of (0.5, 2.0).
+         * With AG (1,0) , which we expect t ebe outside because of the multiplier (radius in x dim is 0.5)
+         * The distance of the AG (1,0) would be ((1-0) / 0.5)^2 + ((0-0) / 2.0)^2 = 4 + 0 = 4
+         * As this distance is larger than the squared radius, we say that the pointis not in the radius.
+         * ----Normal case (HS & HE)----
+         * 
+         * ----Unbounded case (UB)----
+         * If the dimention we are looking at is unbounded, we do not square the distance.
+         * As a result, every point that is smaller than the ab center will return something negative, 
+         *  resulting in far away points being smaller than the radius squared
+         * Take the same AB(0,0) with a radius of 1 and a multiplier of (1,1), and the first (x) dimention open.
+         * Then AG (-100, 0) would be considered part of this AB
+         * because ((-100 - 0) / 1) + ((0 - 0) / 1) ^ 2 = -100, which is smaller than the radius squared
+         * Then, due to the interactions between dimentions, the radius of the second dim also increases.
+         * AG (0, 10) would not be in the AB, But AG (-100, 10) is;
+         * because ((-100 - 0) / 1) + ((10 - 0) / 1) ^ 2 = -100 + 100 = 0, which is smaller than the radius squared
+         * So, the Y radius in the area smaller than the AB becomes -sqrt(X) || sqrt(X)
+         * ----Unbounded case (UB)----
+         * 
+         * In order to allow the AB's to "change direction" to detect anything thats larger, a GetFeatureDimTypes()[x]
+         * value of 2 will swith the AB and AG around the -, having the opposite effect
+         */
+        public static double CalcAGtoABDistance(Antibody antibody, Antigen antigen)
         {
             if (Config == null)
             {
@@ -103,24 +134,23 @@ namespace AISIGA.Program.IGA
             for (int i = 0; i < antibody.GetFeatureMultipliers().Length; i++)
             {
                 
-                if (Config.UseUnboundedRegions)
+                if (Config.UseUnboundedRegions && antibody.GetFeatureDimTypes()[i] == 1)
                 {
                     //If we use UBR, we need to check if this specific dim is a unbounded
-                    if (antibody.GetFeatureDimTypes()[i] == 1 )
-                    {
-                        // If so, we calculate the distance without squaring it
-                        distance += (antigen.GetFeatureValueAt(i) - antibody.GetFeatureValueAt(i)) * antibody.GetFeatureMultipliers()[i];
-                    }
+                    // If so, we calculate the distance without squaring it
+                    distance += (antigen.GetFeatureValueAt(i) - antibody.GetFeatureValueAt(i)) / antibody.GetFeatureMultipliers()[i];
+                    
                 }
                 else
                 {
                     // If we dont use UBR or this dim is not unbounded, we calculate the distance and square it
-                    distance += Math.Pow((antigen.GetFeatureValueAt(i) - antibody.GetFeatureValueAt(i)) * antibody.GetFeatureMultipliers()[i], 2) ;
+                    distance += Math.Pow((antigen.GetFeatureValueAt(i) - antibody.GetFeatureValueAt(i)) / antibody.GetFeatureMultipliers()[i], 2);
                 }
-                    
+                distance = distance;
+
             }
             // Then we substract the base radius of the AB
-            distance -= antibody.GetBaseRadius();
+            distance -= (antibody.GetBaseRadius() * antibody.GetBaseRadius());
             // If the total is smaller than or equal to 0, we have a match
             return distance;
         }
@@ -133,7 +163,7 @@ namespace AISIGA.Program.IGA
             for (int i = 0; i < antigens.Count; i++)
             {
                 Antigen antigen = antigens[i];
-                double distance = IsAntigenMatched(antibody, antigen);
+                double distance = CalcAGtoABDistance(antibody, antigen);
                 if (distance <= 0)
                 {
                     matchedAntigens.Add(antigen);
