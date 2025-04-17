@@ -159,8 +159,6 @@ namespace AISIGA.Program.IGA
                     // If we dont use UBR or this dim is not unbounded, we calculate the distance and square it
                     distance += Math.Pow((antigen.GetFeatureValueAt(i) - antibody.GetFeatureValueAt(i)) / antibody.GetFeatureMultipliers()[i], 2);
                 }
-                distance = distance;
-
             }
             // Then we substract the base radius of the AB
             distance -= (antibody.GetBaseRadius() * antibody.GetBaseRadius());
