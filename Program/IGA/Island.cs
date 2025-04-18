@@ -107,7 +107,7 @@ namespace AISIGA.Program.IGA
         {
             if (this.Neighbour != null)
             {
-                int AmountToMigrate = (int)(Config.MigrationRate * Config.PopulationSize);
+                int AmountToMigrate = (int)((Config.MigrationRate * Config.PopulationSize) / Config.NumberOfIslands);
                 List<Antibody> ToMigrate = new List<Antibody>();
                 ToMigrate.AddRange(Antibodies.Take(AmountToMigrate));
                 List<Antibody> CopiedMigrants = new List<Antibody>();
@@ -180,7 +180,7 @@ namespace AISIGA.Program.IGA
                     + antibody.GetFitness().GetCoverage() * Config.bScoreMultiplier
                     + antibody.GetFitness().GetUniqueness() * Config.cScoreMultiplier
                     + antibody.GetFitness().GetValidAvidity() * Config.dScoreMultiplier
-                    + antibody.GetFitness().GetInvalidAvidity() * Config.eScoreMultiplier);
+                    - antibody.GetFitness().GetInvalidAvidity() * Config.eScoreMultiplier);
                 antibody.GetFitness().SetIsCalculated(true);
                 return antibody.GetFitness().GetTotalFitness();
 

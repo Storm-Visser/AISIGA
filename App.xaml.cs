@@ -4,6 +4,7 @@ using AISIGA.Program.Tests;
 using System.Configuration;
 using System.Data;
 using System.Windows;
+using AISIGA.UI;
 
 namespace AISIGA;
 
@@ -26,9 +27,6 @@ public partial class App : Application
         ExperimentConfig expConfig = new TestConfig();
         Master master = new Master(expConfig);
         master.Initialize();
-        // Set the startup window
-        MainWindow = new MainWindow();
-        MainWindow.Show();
     }
 }
 
