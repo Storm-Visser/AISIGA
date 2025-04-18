@@ -1,4 +1,5 @@
-﻿using AISIGA.Program.Experiments;
+﻿using AISIGA.Program.AIS.VALIS;
+using AISIGA.Program.Experiments;
 using AISIGA.Program.IGA;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,10 @@ namespace AISIGA.Program
         private ExperimentConfig Config { get; set; }
         private List<Island> Islands { get; set; }
 
-        private List<AIS.Antigen> Antigens { get; set; }
+        private List<AIS.Antigen> AntigensTrain { get; set; }
+
+        private List<AIS.Antigen> AntigensTest { get; set; }
+
         private List<AIS.Antibody> Antibodies { get; set; }
 
         // UI Variables
@@ -23,10 +27,12 @@ namespace AISIGA.Program
         public Master(ExperimentConfig config)
         {
             Config = config;
+            EVOFunctions.Config = this.Config;
+            FitnessFunctions.Config = this.Config;
             Islands = new List<Island>();
-            Antigens = new List<AIS.Antigen>();
+            AntigensTrain = new List<AIS.Antigen>();
+            AntigensTest = new List<AIS.Antigen>();
             Antibodies = new List<AIS.Antibody>();
-            Initialize();
         }
 
         public void Initialize()
@@ -35,7 +41,7 @@ namespace AISIGA.Program
             InitAntigensAndAntibodies();
             DivideAntigenAndAntibodies();
             RandomizeAntibodies();
-            Console.WriteLine("Done");
+            StartExperiment();
 
         }
 
@@ -63,23 +69,20 @@ namespace AISIGA.Program
         private void InitAntigensAndAntibodies()
         {
             //Create the Antigens and Antibodies
-            this.Antigens = Data.DataHandler.TranslateDataToAntigens(Config.DataSetNr);
+            (this.AntigensTrain, this.AntigensTest) = Data.DataHandler.TranslateDataToAntigens(Config.DataSetNr, Config.TrainingTestSplit);
             for (int i = 0; i < Config.PopulationSize; i++)
             {
-                this.Antibodies.Add(new AIS.Antibody(-1, Config.BaseRadius, this.Antigens[0].GetLength()));
+                this.Antibodies.Add(new AIS.Antibody(-1, Config.BaseRadius, this.AntigensTrain[0].GetLength()));
             }
         }
 
         private void DivideAntigenAndAntibodies()
         {
-            //Shuffle first
-            this.Antigens = this.Antigens.OrderBy(a => RandomProvider.GetThreadRandom().Next()).ToList();
-
             //Divide the Antigens into the islands Round robin style
-            for (int i = 0; i < this.Antigens.Count; i++)
+            for (int i = 0; i < this.AntigensTrain.Count; i++)
             {
                 int islandIndex = i % 4;
-                this.Islands[islandIndex].AddAntigen(this.Antigens[i]);
+                this.Islands[islandIndex].AddAntigen(this.AntigensTrain[i]);
                 //add the antibodies aswell while we are at it
                 if (i < this.Antibodies.Count)
                 {
@@ -104,23 +107,26 @@ namespace AISIGA.Program
 
             Barrier barrier = new Barrier(islandCount, (b) =>
             {
+                System.Diagnostics.Trace.WriteLine("All islands have reached the barrier. Starting migration...");
                 // This code runs ONCE after all threads hit the barrier
                 foreach (var island in Islands)
                 {
-                    //island.Migrate(Islands); // Shared migration logic
+                    island.Migrate(); // Shared migration logic
                 }
             });
 
             List<Task> islandTasks = new List<Task>();
+            int migrationInterval = (int)(Config.MigrationFrequency * Config.NumberOfGenerations);
             foreach (var island in Islands)
             {
                 var task = Task.Run(() =>
                 {
                     for (int gen = 0; gen < Config.NumberOfGenerations; gen++)
                     {
-                        //island.RunGenerations(1); // Run 1 generation
+                        island.RunGeneration(); // Run 1 generation
 
-                        if ((gen + 1) % Config.MigrationFrequency == 0)
+                        
+                        if ((gen + 1) % migrationInterval == 0)
                         {
                             barrier.SignalAndWait(); // Wait for others
                         }
@@ -139,8 +145,16 @@ namespace AISIGA.Program
 
         private void CollectResults()
         {
+            VALIS.AssingAGClassByVoting(this.Antibodies, this.AntigensTrain);
+            VALIS.AssingAGClassByVoting(this.Antibodies, this.AntigensTest);
 
-            Console.WriteLine("done");
+            // Calculate the fitness of the antibodies
+            double trainFitness = FitnessFunctions.CalculateTotalFitness(this.AntigensTrain);
+            double testFitness = FitnessFunctions.CalculateTotalFitness(this.AntigensTest);
+
+            System.Diagnostics.Trace.WriteLine(testFitness);
+            System.Diagnostics.Trace.WriteLine(trainFitness);
+
         }
     }
 }

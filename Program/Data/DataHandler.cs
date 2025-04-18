@@ -12,7 +12,7 @@ namespace AISIGA.Program.Data
 {
     static class DataHandler
     {
-        public static List<Antigen> TranslateDataToAntigens(int DataSetNr)
+        public static (List<Antigen>, List<Antigen>) TranslateDataToAntigens(int DataSetNr, double TestTrainSplit)
         {
             List<Antigen> Antigens = new List<Antigen>();
 
@@ -69,7 +69,14 @@ namespace AISIGA.Program.Data
                 Antigens.Add(newAntigen);
             }
 
-            return Antigens;
+            //split into train/test
+            Antigens = Antigens.OrderBy(a => RandomProvider.GetThreadRandom().Next()).ToList();
+
+            List<Antigen> AntigensTrain = Antigens.Take((int)(TestTrainSplit * Antigens.Count)).ToList();
+            List<Antigen> AntigensTest = Antigens.Skip((int)(TestTrainSplit * Antigens.Count)).ToList();
+
+
+            return (AntigensTrain, AntigensTest);
         }
 
 

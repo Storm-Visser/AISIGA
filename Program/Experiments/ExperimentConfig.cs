@@ -10,6 +10,7 @@ namespace AISIGA.Program.Experiments
     {
         public abstract int NumberOfGenerations { get; }
         public abstract int PopulationSize { get; }
+        public abstract double PercentageOfParents { get; }
         public abstract int DataSetNr { get; }
         public abstract double TrainingTestSplit { get; }
         public abstract int NumberOfIslands { get; }

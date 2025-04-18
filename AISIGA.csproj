@@ -18,8 +18,4 @@
     <Page Include="App.xaml" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Program\AIS\VALIS\" />
-  </ItemGroup>
-
 </Project>

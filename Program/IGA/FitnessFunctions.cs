@@ -13,7 +13,7 @@ namespace AISIGA.Program.IGA
 {
     static class FitnessFunctions
     {
-        public static ExperimentConfig ?Config { get; set; }
+        public static ExperimentConfig? Config { get; set; }
 
         public static double CalculateCorrectness(double TruePositives, double FalsePositives)
         {
@@ -21,12 +21,12 @@ namespace AISIGA.Program.IGA
         }
         public static double CalculateCoverage(double TruePositives, double AllPositives)
         {
-            return TruePositives/AllPositives;
+            return TruePositives / AllPositives;
         }
 
         public static double CalculateUniqueness(double TruePositives, List<Antibody> antibodies, List<Antigen> matchedAntigens)
         {
-            return CalculateSharedAffinity(antibodies, matchedAntigens) /TruePositives;
+            return CalculateSharedAffinity(antibodies, matchedAntigens) / TruePositives;
         }
 
 
@@ -80,9 +80,9 @@ namespace AISIGA.Program.IGA
                         sharedCount++;
                     }
                 }
-                sharedAffinity += 1/ sharedCount;
+                sharedAffinity += 1 / sharedCount;
             }
-            
+
             return sharedAffinity;
         }
 
@@ -133,18 +133,18 @@ namespace AISIGA.Program.IGA
                 throw new Exception("Config is not set. Please set the config before calling this function.");
             }
             // Make a sum of the distance in each dimension
-            double distance = 0.0;            
+            double distance = 0.0;
 
             // Loop through all dimensions
             for (int i = 0; i < antibody.GetFeatureMultipliers().Length; i++)
             {
-                
+
                 if (Config.UseUnboundedRegions && antibody.GetFeatureDimTypes()[i] == 1)
                 {
                     //If we use UBR, we need to check if this specific dim is a unbounded
                     // If so, we calculate the distance without squaring it
                     distance += (antigen.GetFeatureValueAt(i) - antibody.GetFeatureValueAt(i)) / antibody.GetFeatureMultipliers()[i];
-                    
+
                 }
                 else if (Config.UseUnboundedRegions && antibody.GetFeatureDimTypes()[i] == 2)
                 {
@@ -168,7 +168,7 @@ namespace AISIGA.Program.IGA
 
         public static (List<Antigen>, double[]) GetMatchedAntigens(Antibody antibody, List<Antigen> antigens)
         {
-            List <Antigen> matchedAntigens = new List<Antigen>();
+            List<Antigen> matchedAntigens = new List<Antigen>();
             double[] matchScores = new double[antigens.Count];
 
             for (int i = 0; i < antigens.Count; i++)
@@ -185,7 +185,7 @@ namespace AISIGA.Program.IGA
             return (matchedAntigens, matchScores);
         }
 
-        public static double CalcTruePositives(Antibody antibody, List <Antigen> matchedAntigens)
+        public static double CalcTruePositives(Antibody antibody, List<Antigen> matchedAntigens)
         {
             double truePositives = 0;
             foreach (Antigen AG in matchedAntigens)
@@ -209,6 +209,23 @@ namespace AISIGA.Program.IGA
                 }
             }
             return falsePositives;
+        }
+
+        public static double CalculateTotalFitness(List<Antigen> antigens)
+        {
+            double total = 0.0;
+            double totalCorrect = 0.0;
+
+            foreach (Antigen AG in antigens)
+            {
+                total++;
+                if (AG.GetAssignedClass() == AG.GetActualClass())
+                {
+                    totalCorrect++;
+                }
+            }
+
+            return (totalCorrect / total) * 100;
         }
     }
 }

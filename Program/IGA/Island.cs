@@ -31,14 +31,14 @@ namespace AISIGA.Program.IGA
             Neighbour = neighbour;
         }
 
-        public void AddAntigen(Antigen Antigen)
+        public void AddAntigen(Antigen antigen)
         {
-            this.Antigens.Add(Antigen);
+            this.Antigens.Add(antigen);
         }
 
-        public void AddAntibody(Antibody Antibodie)
+        public void AddAntibody(Antibody antibody)
         {
-            this.Antibodies.Add(Antibodie);
+            this.Antibodies.Add(antibody);
         }
 
         public void InitializeAntibodies()
@@ -128,13 +128,12 @@ namespace AISIGA.Program.IGA
         {
             SortByFitness();
             // Select the best antibodies
-            int AmountToCrossover = (int)(Config.MigrationRate * Config.PopulationSize);
-            List<Antibody> selectedAntibodies = Antibodies.Take(Config.PopulationSize).ToList();
-            for (int i = 0; i < AmountToCrossover; i += 2)
+            int NumberOfParents = (int)(Config.PercentageOfParents * (Config.PopulationSize/Config.NumberOfIslands));
+            for (int i = 0; i < NumberOfParents; i += 2)
             {
                 // Perform crossover
-                Antibody parent1 = selectedAntibodies[i];
-                Antibody parent2 = selectedAntibodies[i + 1];
+                Antibody parent1 = Antibodies[i];
+                Antibody parent2 = Antibodies[i + 1];
                 (Antibody child1, Antibody child2) = EVOFunctions.CrossoverAntibodies(parent1, parent2);
 
                 // Mutate the children

@@ -16,7 +16,7 @@ namespace AISIGA.Program.Tests.MethodTests
         {
             ExperimentConfig config = new TestConfig();
             FitnessFunctions.Config = config;
-            //TestHypersphere();
+            TestHypersphere();
             TestHyperellipsoid();
             TestOneUnboundedRegion();
             TestOneUnboundedRegionOppositeDir();
