@@ -8,7 +8,7 @@ namespace AISIGA.Program.Experiments
 {
     class TestConfig : ExperimentConfig
     {
-        public override int NumberOfGenerations => 100;
+        public override int NumberOfGenerations => 300;
         public override int PopulationSize => 200;
         public override double PercentageOfParents => 0.3;
         public override int DataSetNr => 0; 
