@@ -243,10 +243,11 @@ namespace AISIGA.Program.IGA
             return TotalABsOfSameClass == 0 ? 1 : TotalABsOfSameClass;
         }
 
-        public static double CalculateTotalFitness(List<Antigen> antigens)
+        public static (double, double) CalculateTotalFitness(List<Antigen> antigens)
         {
             double total = 0.0;
             double totalCorrect = 0.0;
+            double totalUnassigned = 0.0;
 
             foreach (Antigen AG in antigens)
             {
@@ -255,9 +256,13 @@ namespace AISIGA.Program.IGA
                 {
                     totalCorrect++;
                 }
+                if (AG.GetAssignedClass() == -1)
+                {
+                    totalUnassigned++;
+                }
             }
 
-            return (totalCorrect / total) * 100;
+            return ((totalCorrect / total) * 100, (totalUnassigned / total) * 100);
         }
     }
 }

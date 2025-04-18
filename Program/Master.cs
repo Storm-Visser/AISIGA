@@ -149,11 +149,13 @@ namespace AISIGA.Program
             VALIS.AssingAGClassByVoting(this.Antibodies, this.AntigensTest);
 
             // Calculate the fitness of the antibodies
-            double trainFitness = FitnessFunctions.CalculateTotalFitness(this.AntigensTrain);
-            double testFitness = FitnessFunctions.CalculateTotalFitness(this.AntigensTest);
+            (double trainFitness, double trainUnassigned) = FitnessFunctions.CalculateTotalFitness(this.AntigensTrain);
+            (double testFitness, double testUnassigned) = FitnessFunctions.CalculateTotalFitness(this.AntigensTest);
 
             System.Diagnostics.Trace.WriteLine(testFitness);
+            System.Diagnostics.Trace.WriteLine(testUnassigned);
             System.Diagnostics.Trace.WriteLine(trainFitness);
+            System.Diagnostics.Trace.WriteLine(trainUnassigned);
 
         }
     }
