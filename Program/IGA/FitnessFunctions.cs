@@ -17,15 +17,19 @@ namespace AISIGA.Program.IGA
 
         public static double CalculateCorrectness(double TruePositives, double FalsePositives)
         {
-            return (TruePositives - (FalsePositives * 2)) / FalsePositives + TruePositives;
+            double result = (TruePositives - (FalsePositives * 2)) / (FalsePositives + TruePositives);
+
+            return double.IsNaN(result) ? 0 : result;
         }
         public static double CalculateCoverage(double TruePositives, double AllPositives)
         {
+            if (AllPositives == 0) return 0;
             return TruePositives / AllPositives;
         }
 
         public static double CalculateUniqueness(double TruePositives, List<Antibody> antibodies, List<Antigen> matchedAntigens)
         {
+            if (TruePositives == 0) return 0;
             return CalculateSharedAffinity(antibodies, matchedAntigens) / TruePositives;
         }
 
@@ -44,6 +48,7 @@ namespace AISIGA.Program.IGA
                     matchedCount++;
                 }
             }
+            if (matchedCount == 0) return 0.0;
             return totalAvidity / matchedCount;
         }
 
@@ -60,6 +65,7 @@ namespace AISIGA.Program.IGA
                     matchedCount++;
                 }
             }
+            if (matchedCount == 0) return 0.0;
             return totalAvidity / matchedCount;
         }
 
@@ -80,7 +86,15 @@ namespace AISIGA.Program.IGA
                         sharedCount++;
                     }
                 }
-                sharedAffinity += 1 / sharedCount;
+                // Avoid division by zero
+                if (sharedCount > 0)
+                {
+                    sharedAffinity += 1 / sharedCount;
+                }
+                else
+                {
+                    sharedAffinity += 0;
+                }
             }
 
             return sharedAffinity;
@@ -169,7 +183,7 @@ namespace AISIGA.Program.IGA
         public static (List<Antigen>, double[]) GetMatchedAntigens(Antibody antibody, List<Antigen> antigens)
         {
             List<Antigen> matchedAntigens = new List<Antigen>();
-            double[] matchScores = new double[antigens.Count];
+            List<double> matchScoresList = new List<double>();
 
             for (int i = 0; i < antigens.Count; i++)
             {
@@ -178,10 +192,14 @@ namespace AISIGA.Program.IGA
                 if (distance <= 0)
                 {
                     matchedAntigens.Add(antigen);
-                    matchScores[i] = distance;
+                    matchScoresList.Add(distance);
                 }
             }
-
+            double[] matchScores = new double[matchScoresList.Count];
+            for (int i = 0; i < matchScoresList.Count; i++)
+            {
+                matchScores[i] = matchScoresList[i];
+            }
             return (matchedAntigens, matchScores);
         }
 
@@ -209,6 +227,20 @@ namespace AISIGA.Program.IGA
                 }
             }
             return falsePositives;
+        }
+
+        public static double CalcAllPositivesOfClass(Antibody antibody, List<Antibody> antibodies)
+        {
+            double TotalABsOfSameClass = 0;
+            foreach (Antibody ab in antibodies)
+            {
+                if (antibody.GetClass() == ab.GetClass())
+                {
+                    TotalABsOfSameClass++;
+                }
+            }
+            
+            return TotalABsOfSameClass == 0 ? 1 : TotalABsOfSameClass;
         }
 
         public static double CalculateTotalFitness(List<Antigen> antigens)

@@ -41,8 +41,8 @@ namespace AISIGA.Program
             InitAntigensAndAntibodies();
             DivideAntigenAndAntibodies();
             RandomizeAntibodies();
+            CollectResults();
             StartExperiment();
-
         }
 
         private void InitIslands()

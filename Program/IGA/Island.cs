@@ -168,7 +168,7 @@ namespace AISIGA.Program.IGA
                 (List<Antigen> matchedAntigens, double[] matchScores) = FitnessFunctions.GetMatchedAntigens(antibody, allAntigens);
                 double TruePositives = FitnessFunctions.CalcTruePositives(antibody, matchedAntigens);
                 double FalsePositives = FitnessFunctions.CalcFalsePositives(antibody, matchedAntigens); ;
-                double AllPositivesOfSameClass = 0;
+                double AllPositivesOfSameClass = FitnessFunctions.CalcAllPositivesOfClass(antibody, allAntibodies);
                 
 
                 antibody.GetFitness().SetCorrectness(FitnessFunctions.CalculateCorrectness(TruePositives, FalsePositives));
