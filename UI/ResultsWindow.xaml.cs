@@ -43,9 +43,8 @@ namespace AISIGA.UI
             {
                 new Axis
                 {
-                    MinLimit = minX - 4,  // Padding
-                    MaxLimit = maxX + 4,
-                    Labeler = value => value.ToString("Feature 1")  // Format the axis labels
+                    MinLimit = minX - 1,  // Padding
+                    MaxLimit = maxX + 1,
                 }
             };
 
@@ -53,9 +52,8 @@ namespace AISIGA.UI
             {
                 new Axis
                 {
-                    MinLimit = minY - 4,  // Padding
-                    MaxLimit = maxY + 4,
-                    Labeler = value => value.ToString("Feature 2")  // Format the axis labels
+                    MinLimit = minY - 1,  // Padding
+                    MaxLimit = maxY + 1,
                 }
             };
 

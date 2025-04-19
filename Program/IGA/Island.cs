@@ -84,8 +84,9 @@ namespace AISIGA.Program.IGA
             // Create antibodies based on the min and max values
             foreach (Antibody antibody in Antibodies)
             {
+                antibody.AssingRandomClassAndRadius(Config.BaseRadius);
                 antibody.AssignRandomFeatureValuesAndMultipliers(maxValues, minValues, Config.UseHyperSpheres);
-                antibody.AssingRandomClass();
+
             }
         }
 

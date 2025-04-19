@@ -118,9 +118,10 @@ namespace AISIGA.Program.AIS
             }
         }
 
-        public void AssingRandomClass()
+        public void AssingRandomClassAndRadius(double baseRadius)
         {
             this.Class = RandomProvider.GetThreadRandom().Next(0, LabelEncoder.ClassCount);
+            this.BaseRadius =  baseRadius * RandomProvider.GetThreadRandom().NextDouble() * 1.9 + 0.1;
         }
 
         public double GetFeatureValueAt(int index)
