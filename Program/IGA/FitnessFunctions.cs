@@ -17,7 +17,7 @@ namespace AISIGA.Program.IGA
 
         public static double CalculateCorrectness(double TruePositives, double FalsePositives)
         {
-            double result = (TruePositives - (FalsePositives * 2)) / (FalsePositives + TruePositives);
+            double result = (TruePositives - FalsePositives) / (FalsePositives + TruePositives);
 
             return double.IsNaN(result) ? 0 : result;
         }

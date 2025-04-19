@@ -27,8 +27,6 @@ namespace AISIGA.Program
 
         private List<AIS.Antigen> AntigensTest { get; set; }
 
-        private List<AIS.Antibody> Antibodies { get; set; }
-
         private DashboardWindow DashboardWindow { get; set; } // UI
 
         // UI Variables
@@ -41,7 +39,6 @@ namespace AISIGA.Program
             Islands = new List<Island>();
             AntigensTrain = new List<AIS.Antigen>();
             AntigensTest = new List<AIS.Antigen>();
-            Antibodies = new List<AIS.Antibody>();
             DashboardWindow = dashboardWindow;
         }
 
@@ -80,23 +77,25 @@ namespace AISIGA.Program
         {
             //Create the Antigens and Antibodies
             (this.AntigensTrain, this.AntigensTest) = Data.DataHandler.TranslateDataToAntigens(Config.DataSetNr, Config.TrainingTestSplit);
-            for (int i = 0; i < Config.PopulationSize; i++)
-            {
-                this.Antibodies.Add(new AIS.Antibody(-1, Config.BaseRadius, this.AntigensTrain[0].GetLength()));
-            }
+            
         }
 
         private void DivideAntigenAndAntibodies()
         {
+            List<Antibody> antibodies = new List<Antibody>();
+            for (int i = 0; i < Config.PopulationSize; i++)
+            {
+                antibodies.Add(new AIS.Antibody(-1, Config.BaseRadius, this.AntigensTrain[0].GetLength()));
+            }
             //Divide the Antigens into the islands Round robin style
             for (int i = 0; i < this.AntigensTrain.Count; i++)
             {
                 int islandIndex = i % 4;
                 this.Islands[islandIndex].AddAntigen(this.AntigensTrain[i]);
                 //add the antibodies aswell while we are at it
-                if (i < this.Antibodies.Count)
+                if (i < antibodies.Count)
                 {
-                    this.Islands[islandIndex].AddAntibody(this.Antibodies[i]);
+                    this.Islands[islandIndex].AddAntibody(antibodies[i]);
                 }
             }
         }
@@ -133,7 +132,7 @@ namespace AISIGA.Program
                     {
                         island.RunGeneration(); // Run 1 generation
 
-                        if(gen % 10 == 0)
+                        if(gen % (migrationInterval / 3) == 0)
                         {
                             // Update the UI with the results
                             if (island == Islands[0])
@@ -207,7 +206,7 @@ namespace AISIGA.Program
             // Update the UI with the results
             DashboardWindow.Dispatcher.Invoke(() =>
             {
-                DashboardWindow.AddToSeries(DashboardWindow.LargeSeries, CalculateUIMetrics(this.Antibodies));
+                DashboardWindow.AddToSeries(DashboardWindow.LargeSeries, CalculateUIMetrics(this.GatherAntibodies()));
             });
         }
 
@@ -226,10 +225,15 @@ namespace AISIGA.Program
             return metrics;
         }
 
+        public List<Antibody> GatherAntibodies()
+        {
+            return Islands.SelectMany(i => i.GetAntibodies()).ToList();
+        }
+
         private void CollectResults()
         {
-            VALIS.AssingAGClassByVoting(this.Antibodies, this.AntigensTrain);
-            VALIS.AssingAGClassByVoting(this.Antibodies, this.AntigensTest);
+            VALIS.AssingAGClassByVoting(this.GatherAntibodies(), this.AntigensTrain);
+            VALIS.AssingAGClassByVoting(this.GatherAntibodies(), this.AntigensTest);
 
             // Calculate the fitness of the antibodies
             (double trainFitness, double trainUnassigned) = FitnessFunctions.CalculateTotalFitness(this.AntigensTrain);

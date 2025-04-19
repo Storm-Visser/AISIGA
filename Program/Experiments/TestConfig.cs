@@ -8,8 +8,8 @@ namespace AISIGA.Program.Experiments
 {
     class TestConfig : ExperimentConfig
     {
-        public override int NumberOfGenerations => 300;
-        public override int PopulationSize => 200;
+        public override int NumberOfGenerations => 1000;
+        public override int PopulationSize => 300;
         public override double PercentageOfParents => 0.3;
         public override int DataSetNr => 0; 
         public override double TrainingTestSplit => 0.8;
@@ -22,15 +22,15 @@ namespace AISIGA.Program.Experiments
         public override double MigrationRate => 0.2;
         public override double MigrationFrequency => 0.1;
 
-        public override double aScoreMultiplier => 2.0;
-        public override double bScoreMultiplier => 10.0;
-        public override double cScoreMultiplier => 10.0;
-        public override double dScoreMultiplier => 10.0;
-        public override double eScoreMultiplier => 10.0;
+        public override double aScoreMultiplier => 10.0;
+        public override double bScoreMultiplier => 1.0;
+        public override double cScoreMultiplier => 0.0;
+        public override double dScoreMultiplier => 0.0;
+        public override double eScoreMultiplier => 0.0;
 
         public override bool UseHyperSpheres => true;
         public override bool UseHyperEllipsoids => true;
-        public override bool UseUnboundedRegions => true;
+        public override bool UseUnboundedRegions => false;
         public override bool UseAffinityMaturationMutation => false;
         public override double BaseRadius => 0.5;
     }
