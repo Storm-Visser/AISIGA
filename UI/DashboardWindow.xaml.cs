@@ -35,11 +35,11 @@ namespace AISIGA.UI
             InitializeComponent();
 
             // Setup series collections
-            LargeSeries = CreateSeries();
-            SmallSeries1 = CreateSeries();
-            SmallSeries2 = CreateSeries();
-            SmallSeries3 = CreateSeries();
-            SmallSeries4 = CreateSeries();
+            LargeSeries = CreateSeries(true);
+            SmallSeries1 = CreateSeries(false);
+            SmallSeries2 = CreateSeries(false);
+            SmallSeries3 = CreateSeries(false);
+            SmallSeries4 = CreateSeries(false);
 
             DataContext = this;
         }
@@ -47,15 +47,15 @@ namespace AISIGA.UI
         private readonly (string Name, Color Color)[] MetricDefs = new[]
         {
             ("Total Fitness", Colors.Red),
-            ("Correctness", Colors.Green),
+            ("Correctness", Colors.Orange),
             ("Coverage", Colors.Blue),
-            ("Uniqueness", Colors.Purple),
+            ("Uniqueness", Colors.Brown),
             ("Valid Avidity", Colors.Yellow),
             ("Invalid Avidity", Colors.Orange)
         };
 
 
-        private ObservableCollection<ISeries> CreateSeries()
+        private ObservableCollection<ISeries> CreateSeries(bool main)
         {
             var seriesCollection = new ObservableCollection<ISeries>();
 
@@ -66,8 +66,25 @@ namespace AISIGA.UI
                     Values = new ObservableCollection<double> { 0 },
                     Name = name,
                     Stroke = new SolidColorPaint(new SKColor(color.R, color.G, color.B)),
-                    Fill = null, 
-                    GeometrySize = 4 
+                    GeometryFill = new SolidColorPaint(new SKColor(color.R, color.G, color.B)), 
+                    GeometrySize = 6,
+                    GeometryStroke = new SolidColorPaint(new SKColor(color.R, color.G, color.B)), // Match border color to the line color
+                    Fill = null
+                });
+            }
+
+            if (main)
+            {
+                seriesCollection.Add(new LineSeries<double>
+                {
+                    Values = new ObservableCollection<double> { 0 },
+                    Name = "Actual Accuracy %",
+                    Stroke = new SolidColorPaint(new SKColor(0, 255, 0)),
+                    
+                    GeometryFill = new SolidColorPaint(new SKColor(0, 255, 0)),
+                    GeometrySize = 10,
+                    GeometryStroke = new SolidColorPaint(new SKColor(0, 255, 0)),
+                    Fill = null
                 });
             }
 

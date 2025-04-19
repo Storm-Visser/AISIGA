@@ -69,43 +69,28 @@ namespace AISIGA.Program.IGA
             return (totalAvidity / matchedCount) * -1;
         }
 
-
-        private static double CalculateSharedAffinity(List<Antibody> antibodies, List<Antigen> matchedAntigens)
+        public static (double, double) CalculateTotalFitness(List<Antigen> antigens)
         {
-            double sharedAffinity = 0.0;
-            foreach (Antigen AG in matchedAntigens)
+            double total = 0.0;
+            double totalCorrect = 0.0;
+            double totalUnassigned = 0.0;
+
+            foreach (Antigen AG in antigens)
             {
-                double sharedCount = 0.0;
-                // Loop through all antibodies
-                foreach (Antibody AB in antibodies)
+                total++;
+                if (AG.GetAssignedClass() == AG.GetActualClass())
                 {
-                    // Check if the antibody matches the antigen
-                    double distance = CalcAGtoABDistance(AB, AG);
-                    if (distance <= 0)
-                    {
-                        sharedCount++;
-                    }
+                    totalCorrect++;
                 }
-                // Avoid division by zero
-                if (sharedCount > 0)
+                if (AG.GetAssignedClass() == -1)
                 {
-                    sharedAffinity += 1 / sharedCount;
-                }
-                else
-                {
-                    sharedAffinity += 0;
+                    totalUnassigned++;
                 }
             }
 
-            return sharedAffinity;
+            return ((totalCorrect / total) * 100, (totalUnassigned / total) * 100);
         }
-
-        private static double Sigmoid(double x)
-        {
-            return 1 - (1 / (1 + Math.Exp(-x)));
-        }
-
-
+        // -------------------------------------------------- Helper Functions --------------------------------------------------
         /*
          * This function is a bit complicated, so ill try to explain.
          * We keep track of the total distance in each dimension. In case of 2d, the x distance and the y distance
@@ -180,6 +165,41 @@ namespace AISIGA.Program.IGA
             return distance;
         }
 
+        private static double CalculateSharedAffinity(List<Antibody> antibodies, List<Antigen> matchedAntigens)
+        {
+            double sharedAffinity = 0.0;
+            foreach (Antigen AG in matchedAntigens)
+            {
+                double sharedCount = 0.0;
+                // Loop through all antibodies
+                foreach (Antibody AB in antibodies)
+                {
+                    // Check if the antibody matches the antigen
+                    double distance = CalcAGtoABDistance(AB, AG);
+                    if (distance <= 0)
+                    {
+                        sharedCount++;
+                    }
+                }
+                // Avoid division by zero
+                if (sharedCount > 0)
+                {
+                    sharedAffinity += 1 / sharedCount;
+                }
+                else
+                {
+                    sharedAffinity += 0;
+                }
+            }
+
+            return sharedAffinity;
+        }
+
+        private static double Sigmoid(double x)
+        {
+            return 1 - (1 / (1 + Math.Exp(-x)));
+        }
+
         public static (List<Antigen>, double[]) GetMatchedAntigens(Antibody antibody, List<Antigen> antigens)
         {
             List<Antigen> matchedAntigens = new List<Antigen>();
@@ -241,28 +261,6 @@ namespace AISIGA.Program.IGA
             }
             
             return TotalABsOfSameClass == 0 ? 1 : TotalABsOfSameClass;
-        }
-
-        public static (double, double) CalculateTotalFitness(List<Antigen> antigens)
-        {
-            double total = 0.0;
-            double totalCorrect = 0.0;
-            double totalUnassigned = 0.0;
-
-            foreach (Antigen AG in antigens)
-            {
-                total++;
-                if (AG.GetAssignedClass() == AG.GetActualClass())
-                {
-                    totalCorrect++;
-                }
-                if (AG.GetAssignedClass() == -1)
-                {
-                    totalUnassigned++;
-                }
-            }
-
-            return ((totalCorrect / total) * 100, (totalUnassigned / total) * 100);
         }
     }
 }

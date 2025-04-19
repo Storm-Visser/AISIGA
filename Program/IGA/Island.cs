@@ -176,16 +176,16 @@ namespace AISIGA.Program.IGA
                 double AllPositivesOfSameClass = FitnessFunctions.CalcAllPositivesOfClass(antibody, allAntibodies);
                 
 
-                antibody.GetFitness().SetCorrectness(FitnessFunctions.CalculateCorrectness(TruePositives, FalsePositives));
-                antibody.GetFitness().SetCoverage(FitnessFunctions.CalculateCoverage(TruePositives, AllPositivesOfSameClass));
-                antibody.GetFitness().SetUniqueness(FitnessFunctions.CalculateUniqueness(TruePositives, allAntibodies, matchedAntigens));
-                antibody.GetFitness().SetValidAvidity(FitnessFunctions.CalculateAvidity(matchedAntigens, matchScores));
-                antibody.GetFitness().SetInvalidAvidity(FitnessFunctions.CalculateInvalidAvidity(matchedAntigens, matchScores));
-                antibody.GetFitness().SetTotalFitness(antibody.GetFitness().GetCorrectness() * Config.aScoreMultiplier 
-                    + antibody.GetFitness().GetCoverage() * Config.bScoreMultiplier
-                    + antibody.GetFitness().GetUniqueness() * Config.cScoreMultiplier
-                    + antibody.GetFitness().GetValidAvidity() * Config.dScoreMultiplier
-                    + antibody.GetFitness().GetInvalidAvidity() * Config.eScoreMultiplier);
+                antibody.GetFitness().SetCorrectness(FitnessFunctions.CalculateCorrectness(TruePositives, FalsePositives) * Config.aScoreMultiplier);
+                antibody.GetFitness().SetCoverage(FitnessFunctions.CalculateCoverage(TruePositives, AllPositivesOfSameClass) * Config.bScoreMultiplier);
+                antibody.GetFitness().SetUniqueness(FitnessFunctions.CalculateUniqueness(TruePositives, allAntibodies, matchedAntigens) * Config.cScoreMultiplier);
+                antibody.GetFitness().SetValidAvidity(FitnessFunctions.CalculateAvidity(matchedAntigens, matchScores) * Config.dScoreMultiplier);
+                antibody.GetFitness().SetInvalidAvidity(FitnessFunctions.CalculateInvalidAvidity(matchedAntigens, matchScores) * Config.eScoreMultiplier);
+                antibody.GetFitness().SetTotalFitness(antibody.GetFitness().GetCorrectness() 
+                    + antibody.GetFitness().GetCoverage()
+                    + antibody.GetFitness().GetUniqueness()
+                    + antibody.GetFitness().GetValidAvidity()
+                    + antibody.GetFitness().GetInvalidAvidity());
                 antibody.GetFitness().SetIsCalculated(true);
                 return antibody.GetFitness().GetTotalFitness();
 

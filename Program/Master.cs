@@ -12,6 +12,7 @@ using System.Net.Http.Headers;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
 using System.Xml.Serialization;
@@ -23,9 +24,7 @@ namespace AISIGA.Program
         private ExperimentConfig Config { get; set; }
         private List<Island> Islands { get; set; }
 
-        private List<AIS.Antigen> AntigensTrain { get; set; }
-
-        private List<AIS.Antigen> AntigensTest { get; set; }
+        private List<AIS.Antigen> Antigens { get; set; }
 
         private DashboardWindow DashboardWindow { get; set; } // UI
 
@@ -37,8 +36,7 @@ namespace AISIGA.Program
             EVOFunctions.Config = this.Config;
             FitnessFunctions.Config = this.Config;
             Islands = new List<Island>();
-            AntigensTrain = new List<AIS.Antigen>();
-            AntigensTest = new List<AIS.Antigen>();
+            Antigens = new List<AIS.Antigen>();
             DashboardWindow = dashboardWindow;
         }
 
@@ -48,7 +46,7 @@ namespace AISIGA.Program
             InitAntigensAndAntibodies();
             DivideAntigenAndAntibodies();
             RandomizeAntibodies();
-            CollectResults();
+            CollectResults(false);
             StartExperiment();
         }
 
@@ -76,8 +74,8 @@ namespace AISIGA.Program
         private void InitAntigensAndAntibodies()
         {
             //Create the Antigens and Antibodies
-            (this.AntigensTrain, this.AntigensTest) = Data.DataHandler.TranslateDataToAntigens(Config.DataSetNr, Config.TrainingTestSplit);
-            
+            this.Antigens = Data.DataHandler.TranslateDataToAntigens(Config.DataSetNr, Config.TrainingTestSplit);
+            this.Antigens = this.Antigens.OrderBy(x => RandomProvider.GetThreadRandom().Next()).ToList();
         }
 
         private void DivideAntigenAndAntibodies()
@@ -85,13 +83,13 @@ namespace AISIGA.Program
             List<Antibody> antibodies = new List<Antibody>();
             for (int i = 0; i < Config.PopulationSize; i++)
             {
-                antibodies.Add(new AIS.Antibody(-1, Config.BaseRadius, this.AntigensTrain[0].GetLength()));
+                antibodies.Add(new AIS.Antibody(-1, Config.BaseRadius, this.Antigens[0].GetLength()));
             }
             //Divide the Antigens into the islands Round robin style
-            for (int i = 0; i < this.AntigensTrain.Count; i++)
+            for (int i = 0; i < this.Antigens.Count; i++)
             {
                 int islandIndex = i % 4;
-                this.Islands[islandIndex].AddAntigen(this.AntigensTrain[i]);
+                this.Islands[islandIndex].AddAntigen(this.Antigens[i]);
                 //add the antibodies aswell while we are at it
                 if (i < antibodies.Count)
                 {
@@ -167,7 +165,7 @@ namespace AISIGA.Program
             Task.WaitAll(islandTasks.ToArray());
 
             //Done Threading
-            CollectResults();
+            CollectResults(true);
 
         }
 
@@ -197,7 +195,7 @@ namespace AISIGA.Program
             // Update the UI with the results
             DashboardWindow.Dispatcher.Invoke(() =>
             {
-                DashboardWindow.AddToSeries(target, CalculateUIMetrics(antibodies));
+                DashboardWindow.AddToSeries(target, CalculateUIMetrics(antibodies, false));
             });
         }
         
@@ -206,22 +204,26 @@ namespace AISIGA.Program
             // Update the UI with the results
             DashboardWindow.Dispatcher.Invoke(() =>
             {
-                DashboardWindow.AddToSeries(DashboardWindow.LargeSeries, CalculateUIMetrics(this.GatherAntibodies()));
+                DashboardWindow.AddToSeries(DashboardWindow.LargeSeries, CalculateUIMetrics(this.GatherAntibodies(), true));
             });
         }
 
-        private double[] CalculateUIMetrics(List<Antibody> antibodies)
+        private double[] CalculateUIMetrics(List<Antibody> antibodies, bool main)
         {
-            double[] metrics =
-            [
-                // Calculate the metrics
-                antibodies.Average(a => a.GetFitness().GetTotalFitness()),
-                antibodies.Average(a => a.GetFitness().GetCorrectness()),
-                antibodies.Average(a => a.GetFitness().GetCoverage()),
-                antibodies.Average(a => a.GetFitness().GetUniqueness()),
-                antibodies.Average(a => a.GetFitness().GetValidAvidity()),
-                antibodies.Average(a => a.GetFitness().GetInvalidAvidity()),
-            ];
+            double[] metrics = new double[6];
+            if (main) { metrics = new double[7]; }
+            metrics[0] = antibodies.Average(a => a.GetFitness().GetTotalFitness());
+            metrics[1] = antibodies.Average(a => a.GetFitness().GetCorrectness());
+            metrics[2] = antibodies.Average(a => a.GetFitness().GetCoverage());
+            metrics[3] = antibodies.Average(a => a.GetFitness().GetUniqueness());
+            metrics[4] = antibodies.Average(a => a.GetFitness().GetValidAvidity());
+            metrics[5] = antibodies.Average(a => a.GetFitness().GetInvalidAvidity());
+            if (main)
+            {
+                VALIS.AssingAGClassByVoting(this.GatherAntibodies(), this.Antigens);
+                (metrics[6], _) = FitnessFunctions.CalculateTotalFitness(this.Antigens);
+            }
+
             return metrics;
         }
 
@@ -230,20 +232,24 @@ namespace AISIGA.Program
             return Islands.SelectMany(i => i.GetAntibodies()).ToList();
         }
 
-        private void CollectResults()
+        private void CollectResults(bool ShowWindow)
         {
-            VALIS.AssingAGClassByVoting(this.GatherAntibodies(), this.AntigensTrain);
-            VALIS.AssingAGClassByVoting(this.GatherAntibodies(), this.AntigensTest);
+            VALIS.AssingAGClassByVoting(this.GatherAntibodies(), this.Antigens);
 
             // Calculate the fitness of the antibodies
-            (double trainFitness, double trainUnassigned) = FitnessFunctions.CalculateTotalFitness(this.AntigensTrain);
-            (double testFitness, double testUnassigned) = FitnessFunctions.CalculateTotalFitness(this.AntigensTest);
+            (double trainFitness, double trainUnassigned) = FitnessFunctions.CalculateTotalFitness(this.Antigens);
 
-            System.Diagnostics.Trace.WriteLine(testFitness);
-            System.Diagnostics.Trace.WriteLine(testUnassigned);
             System.Diagnostics.Trace.WriteLine(trainFitness);
             System.Diagnostics.Trace.WriteLine(trainUnassigned);
 
+            if (ShowWindow)
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    ResultsWindow resultsWindow = new ResultsWindow();
+                    resultsWindow.ShowClassificationResults(this.Antigens, trainFitness);
+                });
+            }
         }
     }
 }

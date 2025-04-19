@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AISIGA.Program.AIS
 {
-    class Antigen
+    public class Antigen
     {
         private int AssingedClass { get; set; }
         private int ActualClass { get; set; }

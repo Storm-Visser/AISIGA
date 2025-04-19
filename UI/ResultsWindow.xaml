@@ -1,0 +1,15 @@
+﻿<Window x:Class="AISIGA.UI.ResultsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
+        Title="Classification Results" Height="700" Width="Auto">
+    <Grid>
+        <!-- Accuracy Percentage -->
+        <TextBlock Name="AccuracyPercentageText" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,10,0,0"/>
+
+        <!-- Scatter Plot of Points -->
+        <lvc:CartesianChart x:Name="Chart" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <!-- Chart Configuration -->
+        </lvc:CartesianChart>
+    </Grid>
+</Window>
