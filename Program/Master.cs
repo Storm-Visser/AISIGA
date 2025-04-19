@@ -1,12 +1,19 @@
-﻿using AISIGA.Program.AIS.VALIS;
+﻿using AISIGA.Program.AIS;
+using AISIGA.Program.AIS.VALIS;
 using AISIGA.Program.Experiments;
 using AISIGA.Program.IGA;
+using AISIGA.UI;
+using LiveChartsCore;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
+using System.Windows.Threading;
 using System.Xml.Serialization;
 
 namespace AISIGA.Program
@@ -22,9 +29,11 @@ namespace AISIGA.Program
 
         private List<AIS.Antibody> Antibodies { get; set; }
 
+        private DashboardWindow DashboardWindow { get; set; } // UI
+
         // UI Variables
 
-        public Master(ExperimentConfig config)
+        public Master(ExperimentConfig config, DashboardWindow dashboardWindow)
         {
             Config = config;
             EVOFunctions.Config = this.Config;
@@ -33,6 +42,7 @@ namespace AISIGA.Program
             AntigensTrain = new List<AIS.Antigen>();
             AntigensTest = new List<AIS.Antigen>();
             Antibodies = new List<AIS.Antibody>();
+            DashboardWindow = dashboardWindow;
         }
 
         public void Initialize()
@@ -89,8 +99,6 @@ namespace AISIGA.Program
                     this.Islands[islandIndex].AddAntibody(this.Antibodies[i]);
                 }
             }
-
-            
         }
 
         private void RandomizeAntibodies()
@@ -125,7 +133,28 @@ namespace AISIGA.Program
                     {
                         island.RunGeneration(); // Run 1 generation
 
-                        
+                        if(gen % 10 == 0)
+                        {
+                            // Update the UI with the results
+                            if (island == Islands[0])
+                            {
+                                UpdateIslandUI(0);
+                            }
+                            else if (island == Islands[1])
+                            {
+                                UpdateIslandUI(1);
+                            }
+                            else if (island == Islands[2])
+                            {
+                                UpdateIslandUI(2);
+                            }
+                            else if (island == Islands[3])
+                            {
+                                UpdateIslandUI(3);
+                                UpdateTotalUI();
+                            }
+                        }
+
                         if ((gen + 1) % migrationInterval == 0)
                         {
                             barrier.SignalAndWait(); // Wait for others
@@ -141,6 +170,60 @@ namespace AISIGA.Program
             //Done Threading
             CollectResults();
 
+        }
+
+        private void UpdateIslandUI(int nr)
+        {
+            ObservableCollection < ISeries > target = new ObservableCollection<ISeries>();
+            List<Antibody> antibodies = Islands[nr].GetAntibodies();
+            switch (nr) 
+            { 
+                case 0:
+                    target = DashboardWindow.SmallSeries1;
+                    break;
+                case 1:
+                    target = DashboardWindow.SmallSeries2;
+                    break;
+                case 2:
+                    target = DashboardWindow.SmallSeries3;
+                    break;
+                case 3:
+                    target = DashboardWindow.SmallSeries4;
+                    break;
+                default:
+                    target = DashboardWindow.SmallSeries1;
+                    break;
+            }
+
+            // Update the UI with the results
+            DashboardWindow.Dispatcher.Invoke(() =>
+            {
+                DashboardWindow.AddToSeries(target, CalculateUIMetrics(antibodies));
+            });
+        }
+        
+        private void UpdateTotalUI()
+        {
+            // Update the UI with the results
+            DashboardWindow.Dispatcher.Invoke(() =>
+            {
+                DashboardWindow.AddToSeries(DashboardWindow.LargeSeries, CalculateUIMetrics(this.Antibodies));
+            });
+        }
+
+        private double[] CalculateUIMetrics(List<Antibody> antibodies)
+        {
+            double[] metrics =
+            [
+                // Calculate the metrics
+                antibodies.Average(a => a.GetFitness().GetTotalFitness()),
+                antibodies.Average(a => a.GetFitness().GetCorrectness()),
+                antibodies.Average(a => a.GetFitness().GetCoverage()),
+                antibodies.Average(a => a.GetFitness().GetUniqueness()),
+                antibodies.Average(a => a.GetFitness().GetValidAvidity()),
+                antibodies.Average(a => a.GetFitness().GetInvalidAvidity()),
+            ];
+            return metrics;
         }
 
         private void CollectResults()

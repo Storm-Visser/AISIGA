@@ -66,7 +66,7 @@ namespace AISIGA.Program.IGA
                 }
             }
             if (matchedCount == 0) return 0.0;
-            return totalAvidity / matchedCount;
+            return (totalAvidity / matchedCount) * -1;
         }
 
 

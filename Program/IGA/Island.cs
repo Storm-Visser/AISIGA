@@ -26,6 +26,11 @@ namespace AISIGA.Program.IGA
             Neighbour = null;
         }
 
+        public List<Antibody> GetAntibodies()
+        {
+            return Antibodies;
+        }
+
         public void SetNeighbour(Island neighbour)
         {
             Neighbour = neighbour;
@@ -180,7 +185,7 @@ namespace AISIGA.Program.IGA
                     + antibody.GetFitness().GetCoverage() * Config.bScoreMultiplier
                     + antibody.GetFitness().GetUniqueness() * Config.cScoreMultiplier
                     + antibody.GetFitness().GetValidAvidity() * Config.dScoreMultiplier
-                    - antibody.GetFitness().GetInvalidAvidity() * Config.eScoreMultiplier);
+                    + antibody.GetFitness().GetInvalidAvidity() * Config.eScoreMultiplier);
                 antibody.GetFitness().SetIsCalculated(true);
                 return antibody.GetFitness().GetTotalFitness();
 

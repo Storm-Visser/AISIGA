@@ -5,6 +5,9 @@ using System.Configuration;
 using System.Data;
 using System.Windows;
 using AISIGA.UI;
+using LiveChartsCore;
+using LiveChartsCore.SkiaSharpView;
+using SkiaSharp.Views.Desktop;
 
 namespace AISIGA;
 
@@ -23,10 +26,7 @@ public partial class App : Application
                 //Tests.Run();
                 System.Diagnostics.Trace.WriteLine("Done With Tests, Now starting program");
         #endif
-        // Initialize the experiment configuration & the controller
-        ExperimentConfig expConfig = new TestConfig();
-        Master master = new Master(expConfig);
-        master.Initialize();
+
     }
 }
 

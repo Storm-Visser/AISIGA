@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using AISIGA.Program.Experiments;
+using AISIGA.Program;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -19,5 +21,22 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+    }
+
+    private void StartProgram_Click(object sender, RoutedEventArgs e)
+    {
+        // Example: Show the dashboard
+        DashboardWindow dashboard = new DashboardWindow();
+        dashboard.Show();
+        // Optional: Hide main window
+        this.Hide();
+
+        // Initialize the experiment configuration & the controller
+        ExperimentConfig expConfig = new TestConfig();
+        Master master = new Master(expConfig, dashboard);
+        Task.Run(() =>
+        {
+            master.Initialize();
+        });
     }
 }

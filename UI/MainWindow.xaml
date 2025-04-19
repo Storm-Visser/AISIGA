@@ -6,7 +6,17 @@
         xmlns:local="clr-namespace:AISIGA.UI"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
-
+    <Grid Background="#FF2D2D30">
+        <Button Content="Start Program"
+            Width="150"
+            Height="50"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Click="StartProgram_Click"
+            FontSize="16"
+            Padding="10"
+            Background="#FF007ACC"
+            Foreground="White"
+            BorderBrush="Transparent"/>
     </Grid>
 </Window>
