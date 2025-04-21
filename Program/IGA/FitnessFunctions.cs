@@ -30,7 +30,7 @@ namespace AISIGA.Program.IGA
         public static double CalculateUniqueness(double TruePositives, List<Antibody> antibodies, List<Antigen> matchedAntigens)
         {
             if (TruePositives == 0) return 0;
-            return CalculateSharedAffinity(antibodies, matchedAntigens) / TruePositives;
+            return Sigmoid(CalculateSharedAffinity(antibodies, matchedAntigens) / TruePositives);
         }
 
 
@@ -170,13 +170,14 @@ namespace AISIGA.Program.IGA
             double sharedAffinity = 0.0;
             foreach (Antigen AG in matchedAntigens)
             {
+                if (AG.GetActualClass() != AG.GetAssignedClass()) continue; // skip false positives
                 double sharedCount = 0.0;
                 // Loop through all antibodies
                 foreach (Antibody AB in antibodies)
                 {
-                    // Check if the antibody matches the antigen
+                    // Check if the antibody matches the antigen, and if it is a correct classification
                     double distance = CalcAGtoABDistance(AB, AG);
-                    if (distance <= 0)
+                    if (distance <= 0 && AB.GetClass() == AG.GetActualClass())
                     {
                         sharedCount++;
                     }
@@ -184,7 +185,7 @@ namespace AISIGA.Program.IGA
                 // Avoid division by zero
                 if (sharedCount > 0)
                 {
-                    sharedAffinity += 1 / sharedCount;
+                    sharedAffinity += 1.0 / sharedCount;
                 }
                 else
                 {
@@ -249,18 +250,20 @@ namespace AISIGA.Program.IGA
             return falsePositives;
         }
 
-        public static double CalcAllPositivesOfClass(Antibody antibody, List<Antibody> antibodies)
+        public static double CalcAllPositivesOfClass(Antibody antibody, List<Antigen> antigens)
         {
-            double TotalABsOfSameClass = 0;
-            foreach (Antibody ab in antibodies)
+            double TotalAGsOfSameClass = 0;
+
+            for (int i = 0; i < antigens.Count; i++)
             {
-                if (antibody.GetClass() == ab.GetClass())
+                Antigen AG = antigens[i];
+                if (antibody.GetClass() == AG.GetActualClass())
                 {
-                    TotalABsOfSameClass++;
+                    TotalAGsOfSameClass++;
                 }
             }
-            
-            return TotalABsOfSameClass == 0 ? 1 : TotalABsOfSameClass;
+
+            return TotalAGsOfSameClass == 0 ? 1 : TotalAGsOfSameClass;
         }
     }
 }

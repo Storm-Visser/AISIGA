@@ -81,7 +81,7 @@ namespace AISIGA.Program
         private void DivideAntigenAndAntibodies()
         {
             List<Antibody> antibodies = new List<Antibody>();
-            for (int i = 0; i < Config.PopulationSize; i++)
+            for (int i = 0; i < (this.Antigens.Count * Config.PopulationSizeFractionOfDatapoints); i++)
             {
                 antibodies.Add(new AIS.Antibody(-1, Config.BaseRadius, this.Antigens[0].GetLength()));
             }
@@ -241,7 +241,7 @@ namespace AISIGA.Program
 
             System.Diagnostics.Trace.WriteLine(trainFitness);
             System.Diagnostics.Trace.WriteLine(trainUnassigned);
-
+            ShowClassDistribution();
             if (ShowWindow)
             {
                 Application.Current.Dispatcher.Invoke(() =>
@@ -249,6 +249,22 @@ namespace AISIGA.Program
                     ResultsWindow resultsWindow = new ResultsWindow();
                     resultsWindow.ShowClassificationResults(this.Antigens, trainFitness);
                 });
+            }
+        }
+
+        private void ShowClassDistribution()
+        {
+            for (int i = 0; i < LabelEncoder.ClassCount; i++)
+            {
+                double totalOfClass = 0;
+                foreach (Antibody AB in this.GatherAntibodies())
+                {
+                    if (AB.GetClass() == i)
+                    {
+                        totalOfClass += 1;
+                    }
+                }
+                System.Diagnostics.Trace.WriteLine($"Class {i}: {totalOfClass / (this.Islands[0].GetAntibodies().Count * 4)}");
             }
         }
     }

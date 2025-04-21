@@ -19,7 +19,7 @@ namespace AISIGA.Program.IGA
         public Fitness()
         {
             IsCalculated = false;
-            TotalFitness = 0;
+            TotalFitness = 1;
             Correctness = 0;
             Coverage = 0;
             Uniqueness = 0;

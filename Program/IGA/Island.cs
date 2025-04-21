@@ -1,4 +1,5 @@
 ﻿using AISIGA.Program.AIS;
+using AISIGA.Program.AIS.VALIS;
 using AISIGA.Program.Experiments;
 using System;
 using System.Collections.Generic;
@@ -92,6 +93,7 @@ namespace AISIGA.Program.IGA
 
         private void SortByFitness()
         {
+            VALIS.AssingAGClassByVoting(Antibodies, Antigens);
             // Sort the antibodies by fitness
             Antibodies = Antibodies
             .OrderByDescending(a => CalculateAntibodyFitness(a, Antibodies, Antigens))
@@ -105,7 +107,7 @@ namespace AISIGA.Program.IGA
             // Sort the antibodies by fitness
             SortByFitness();
             // Remove the excess antibodies
-            this.Antibodies = this.Antibodies.Take(Config.PopulationSize).ToList();
+            this.Antibodies = this.Antibodies.Take((int)(this.Antigens.Count * Config.PopulationSizeFractionOfDatapoints) / Config.NumberOfIslands).ToList();
 
         }
 
@@ -113,7 +115,7 @@ namespace AISIGA.Program.IGA
         {
             if (this.Neighbour != null)
             {
-                int AmountToMigrate = (int)((Config.MigrationRate * Config.PopulationSize) / Config.NumberOfIslands);
+                int AmountToMigrate = (int)((Config.MigrationRate * (this.Antigens.Count * Config.PopulationSizeFractionOfDatapoints)) / Config.NumberOfIslands);
                 List<Antibody> ToMigrate = new List<Antibody>();
                 ToMigrate.AddRange(Antibodies.Take(AmountToMigrate));
                 List<Antibody> CopiedMigrants = new List<Antibody>();
@@ -134,7 +136,7 @@ namespace AISIGA.Program.IGA
         {
             SortByFitness();
             // Select the best antibodies
-            int NumberOfParents = (int)(Config.PercentageOfParents * (Config.PopulationSize/Config.NumberOfIslands));
+            int NumberOfParents = (int)(Config.PercentageOfParents * ((this.Antigens.Count * Config.PopulationSizeFractionOfDatapoints) / Config.NumberOfIslands));
             for (int i = 0; i < NumberOfParents; i += 2)
             {
                 // Perform crossover
@@ -159,7 +161,7 @@ namespace AISIGA.Program.IGA
             // Sort the antibodies by fitness
             SortByFitness();
             // Remove the excess antibodies
-            this.Antibodies = this.Antibodies.Take(Config.PopulationSize).ToList();
+            this.Antibodies = this.Antibodies.Take((int)(this.Antigens.Count * Config.PopulationSizeFractionOfDatapoints) / Config.NumberOfIslands).ToList();
         }
 
 
@@ -174,7 +176,7 @@ namespace AISIGA.Program.IGA
                 (List<Antigen> matchedAntigens, double[] matchScores) = FitnessFunctions.GetMatchedAntigens(antibody, allAntigens);
                 double TruePositives = FitnessFunctions.CalcTruePositives(antibody, matchedAntigens);
                 double FalsePositives = FitnessFunctions.CalcFalsePositives(antibody, matchedAntigens); ;
-                double AllPositivesOfSameClass = FitnessFunctions.CalcAllPositivesOfClass(antibody, allAntibodies);
+                double AllPositivesOfSameClass = FitnessFunctions.CalcAllPositivesOfClass(antibody, allAntigens);
                 
 
                 antibody.GetFitness().SetCorrectness(FitnessFunctions.CalculateCorrectness(TruePositives, FalsePositives) * Config.aScoreMultiplier);
