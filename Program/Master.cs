@@ -100,9 +100,10 @@ namespace AISIGA.Program
 
         private void RandomizeAntibodies()
         {
+            List<double> classDistributionFractions = Data.DataHandler.CalcClassDistribution(this.Antigens);
             foreach (var island in Islands)
             {
-                island.InitializeAntibodies();
+                island.InitializeAntibodies(classDistributionFractions);
             }
         }
 

@@ -1,5 +1,6 @@
 ﻿using AISIGA.Program.AIS;
 using AISIGA.Program.AIS.VALIS;
+using AISIGA.Program.Data;
 using AISIGA.Program.Experiments;
 using System;
 using System.Collections.Generic;
@@ -47,7 +48,7 @@ namespace AISIGA.Program.IGA
             this.Antibodies.Add(antibody);
         }
 
-        public void InitializeAntibodies()
+        public void InitializeAntibodies(List<double> classDistributionFractions)
         {
             int featureCount = Antigens[0].GetLength();
 
@@ -82,10 +83,26 @@ namespace AISIGA.Program.IGA
                 minValues[i] += Config.BaseRadius;
             }
 
-            // Create antibodies based on the min and max values
+            // Set radius based on the min and max values
+            // And set class based on class distribution
             foreach (Antibody antibody in Antibodies)
             {
-                antibody.AssingRandomClassAndRadius(Config.BaseRadius);
+                // Select a class based on the distribution fractions
+                double randomValue = RandomProvider.GetThreadRandom().NextDouble();
+                double cumulativeProbability = 0.0;
+                int selectedClass = 0;
+
+                // Loop through the class fractions to select the class
+                for (int classIndex = 0; classIndex < classDistributionFractions.Count; classIndex++)
+                {
+                    cumulativeProbability += classDistributionFractions[classIndex];
+                    if (randomValue <= cumulativeProbability)
+                    {
+                        selectedClass = classIndex;
+                        break;
+                    }
+                }
+                antibody.AssingRandomClassAndRadius(Config.BaseRadius, selectedClass);
                 antibody.AssignRandomFeatureValuesAndMultipliers(maxValues, minValues, Config.UseHyperSpheres, Config.UseUnboundedRegions, Config.RateOfUnboundedRegions);
 
             }
@@ -167,28 +184,53 @@ namespace AISIGA.Program.IGA
         public void ReplaceByClass()
         {
             int classCount = LabelEncoder.ClassCount;
-            int populationPerClass = (int)((this.Antigens.Count * Config.PopulationSizeFractionOfDatapoints) / Config.NumberOfIslands) / classCount;
 
-            Dictionary<int, List<Antibody>> classGroups = new();
+            // Get the actual class distribution from the population
+            Dictionary<int, int> classDistribution = new Dictionary<int, int>();
+            foreach (var antibody in Antibodies)
+            {
+                int classId = antibody.GetClass();
+                if (classDistribution.ContainsKey(classId))
+                    classDistribution[classId]++;
+                else
+                    classDistribution[classId] = 1;
+            }
 
-            // Initialize class groups
-            for (int i = 0; i < classCount; i++)
-                classGroups[i] = new List<Antibody>();
+            // Dynamically adjust the population for each class
+            Dictionary<int, List<Antibody>> classGroups = new Dictionary<int, List<Antibody>>();
 
             // Group antibodies by class
-            foreach (var ab in Antibodies)
+            foreach (var antibody in Antibodies)
             {
-                classGroups[ab.GetClass()].Add(ab);
+                int classId = antibody.GetClass();
+                if (!classGroups.ContainsKey(classId))
+                    classGroups[classId] = new List<Antibody>();
+                classGroups[classId].Add(antibody);
             }
 
-            // Trim each group to desired size
-            List<Antibody> balancedPopulation = new();
+            // Create the balanced population while respecting the class distribution
+            List<Antibody> balancedPopulation = new List<Antibody>();
+
             foreach (var kvp in classGroups)
             {
-                var sorted = kvp.Value.OrderByDescending(ab => ab.GetFitness().GetTotalFitness()).ToList();
-                balancedPopulation.AddRange(sorted.Take(populationPerClass));
+                int classId = kvp.Key;
+                var antibodiesInClass = kvp.Value;
+
+                // Calculate the target population for this class
+                double classPopulation = (classDistribution.ContainsKey(classId) ? classDistribution[classId] : 0) / (double)Antibodies.Count;
+
+                // Ensure class population is not less than 1
+                classPopulation = Math.Max(classPopulation, 1);
+
+                // Sort each group by fitness and trim to match the calculated population size
+                var sortedAntibodies = antibodiesInClass.OrderByDescending(ab => ab.GetFitness().GetTotalFitness()).ToList();
+                balancedPopulation.AddRange(sortedAntibodies.Take((int)Math.Floor(classPopulation)));
             }
 
+            // Ensure total population size matches the expected number of antibodies
+            balancedPopulation = balancedPopulation.Take((int)(this.Antigens.Count * Config.PopulationSizeFractionOfDatapoints) / Config.NumberOfIslands).ToList();
+
+            // Replace the current population with the balanced one
             Antibodies = balancedPopulation;
         }
 

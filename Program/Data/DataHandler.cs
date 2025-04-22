@@ -10,7 +10,7 @@ using System.Windows.Shapes;
 
 namespace AISIGA.Program.Data
 {
-    static class DataHandler
+    public static class DataHandler
     {
         public static List<Antigen> TranslateDataToAntigens(int DataSetNr)
         {
@@ -73,6 +73,26 @@ namespace AISIGA.Program.Data
             return (Antigens);
         }
 
+        public static List<double> CalcClassDistribution(List<Antigen> antigens)
+        {
+            int totalAntigens = antigens.Count;
+            int[] classCounts = new int[LabelEncoder.ClassCount];
 
+            // Count the number of occurrences of each class in the antigens
+            foreach (var antigen in antigens)
+            {
+                classCounts[antigen.GetActualClass()]++;
+            }
+
+            // Calculate fractions
+            List<double> classFractions = new List<double>();
+            for (int i = 0; i < LabelEncoder.ClassCount; i++)
+            {
+                double fraction = (double)classCounts[i] / totalAntigens;
+                classFractions.Add(fraction);
+            }
+
+            return classFractions;
+        }
     }
 }
