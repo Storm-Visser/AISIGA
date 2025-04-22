@@ -22,16 +22,16 @@ namespace AISIGA.Program.Experiments
         public override double MigrationRate => 0.2;
         public override double MigrationFrequency => 0.1;
 
-        public override double aScoreMultiplier => 4.5;
+        public override double aScoreMultiplier => 2.5;
         public override double bScoreMultiplier => 1.0;
         public override double cScoreMultiplier => 1.2;
         public override double dScoreMultiplier => 0.0;
-        public override double eScoreMultiplier => 3.0;
+        public override double eScoreMultiplier => 1.0;
 
         public override bool UseHyperSpheres => true;
         public override bool UseHyperEllipsoids => true;
         public override bool UseUnboundedRegions => true;
-        public override double RateOfUnboundedRegions => 0.1;
+        public override double RateOfUnboundedRegions => 0.2;
         public override bool UseAffinityMaturationMutation => false;
         public override double BaseRadius => 0.2;
     }
