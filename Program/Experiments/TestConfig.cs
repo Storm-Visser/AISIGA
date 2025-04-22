@@ -30,7 +30,8 @@ namespace AISIGA.Program.Experiments
 
         public override bool UseHyperSpheres => true;
         public override bool UseHyperEllipsoids => true;
-        public override bool UseUnboundedRegions => false;
+        public override bool UseUnboundedRegions => true;
+        public override double RateOfUnboundedRegions => 0.1;
         public override bool UseAffinityMaturationMutation => false;
         public override double BaseRadius => 0.2;
     }

@@ -21,8 +21,8 @@ namespace AISIGA.Program.Tests.MethodTests
             Antibody testABP2 = new Antibody(2, 2, 3);
 
 
-            testABP1.AssignRandomFeatureValuesAndMultipliers([1.9, 1.9, 1.9], [1.0, 1.0, 1.0], config.UseHyperSpheres, config.UseUnboundedRegions);
-            testABP2.AssignRandomFeatureValuesAndMultipliers([2.9, 2.9, 2.9], [2.0, 2.0, 2.0], config.UseHyperSpheres, config.UseUnboundedRegions);
+            testABP1.AssignRandomFeatureValuesAndMultipliers([1.9, 1.9, 1.9], [1.0, 1.0, 1.0], config.UseHyperSpheres, config.UseUnboundedRegions, config.RateOfUnboundedRegions);
+            testABP2.AssignRandomFeatureValuesAndMultipliers([2.9, 2.9, 2.9], [2.0, 2.0, 2.0], config.UseHyperSpheres, config.UseUnboundedRegions, config.RateOfUnboundedRegions);
 
             System.Diagnostics.Debug.WriteLine("TestAB parents: ");
             System.Diagnostics.Debug.WriteLine($"1; Class: {testABP1.GetClass()}, BaseR: {testABP1.GetBaseRadius()}, " +

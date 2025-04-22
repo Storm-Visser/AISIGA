@@ -31,6 +31,7 @@ namespace AISIGA.Program.Experiments
         public abstract bool UseHyperSpheres { get; }
         public abstract bool UseHyperEllipsoids { get; }
         public abstract bool UseUnboundedRegions{ get; }
+        public abstract double RateOfUnboundedRegions { get; }
         public abstract bool UseAffinityMaturationMutation { get; }
         public abstract double BaseRadius { get; }
 

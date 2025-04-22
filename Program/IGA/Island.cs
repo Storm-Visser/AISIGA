@@ -86,7 +86,7 @@ namespace AISIGA.Program.IGA
             foreach (Antibody antibody in Antibodies)
             {
                 antibody.AssingRandomClassAndRadius(Config.BaseRadius);
-                antibody.AssignRandomFeatureValuesAndMultipliers(maxValues, minValues, Config.UseHyperSpheres, Config.UseUnboundedRegions);
+                antibody.AssignRandomFeatureValuesAndMultipliers(maxValues, minValues, Config.UseHyperSpheres, Config.UseUnboundedRegions, Config.RateOfUnboundedRegions);
 
             }
         }
