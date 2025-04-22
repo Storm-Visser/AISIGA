@@ -11,24 +11,44 @@ namespace AISIGA.Program.IGA
     static class EVOFunctions
     {
         public static ExperimentConfig? Config { get; set; }
+
+        public static Antibody TournamentSelect(List<Antibody> population, int tournamentSize)
+        {
+            // Randomly select 'tournamentSize' antibodies
+            List<Antibody> tournamentContestants = new List<Antibody>();
+            Random rand = new Random();
+
+            for (int i = 0; i < tournamentSize; i++)
+            {
+                int randomIndex = rand.Next(population.Count);
+                tournamentContestants.Add(population[randomIndex]);
+            }
+
+            // Select the best antibody from the tournament
+            Antibody bestContestant = tournamentContestants.OrderByDescending(a => a.GetFitness().GetTotalFitness()).First();
+
+            return bestContestant;
+        }
+
+
         public static Antibody MutateAntibody(Antibody antibody)
         {
             if (Config == null)
             {
                 throw new Exception("Config is not set. Please set the config before calling this function.");
             }
-            
-            
-            ////Mutate class
-            //if (RandomProvider.GetThreadRandom().NextDouble() < Config.MutationFrequency)
-            //{
-            //    //get a list of possible classes (not the current class) from encoding
-            //    List<int> possibleClasses = Enumerable.Range(0, LabelEncoder.ClassCount)
-            //        .Where(c => c != antibody.GetClass())
-            //        .ToList();
-            //    //randomly select a class from the list
-            //    antibody.SetClass(possibleClasses[RandomProvider.GetThreadRandom().Next(possibleClasses.Count)]);
-            //}
+
+
+            //Mutate class
+            if (RandomProvider.GetThreadRandom().NextDouble() < Config.MutationFrequency)
+            {
+                //get a list of possible classes (not the current class) from encoding
+                List<int> possibleClasses = Enumerable.Range(0, LabelEncoder.ClassCount)
+                    .Where(c => c != antibody.GetClass())
+                    .ToList();
+                //randomly select a class from the list
+                antibody.SetClass(possibleClasses[RandomProvider.GetThreadRandom().Next(possibleClasses.Count)]);
+            }
 
 
             //Mutate base radius
@@ -107,16 +127,16 @@ namespace AISIGA.Program.IGA
             Antibody child2 = new Antibody(Parent2.GetClass(), -1, Parent2.GetFeatureMultipliers().Length);
 
             //Select class
-            //if (RandomProvider.GetThreadRandom().NextDouble() < Config.CrossoverFrequency)
-            //{
-            //    child1.SetClass(Parent2.GetClass());
-            //    child2.SetClass(Parent1.GetClass());
-            //}
-            //else
-            //{
-            //    child1.SetClass(Parent1.GetClass());
-            //    child2.SetClass(Parent2.GetClass());
-            //}
+            if (RandomProvider.GetThreadRandom().NextDouble() < Config.CrossoverFrequency)
+            {
+                child1.SetClass(Parent2.GetClass());
+                child2.SetClass(Parent1.GetClass());
+            }
+            else
+            {
+                child1.SetClass(Parent1.GetClass());
+                child2.SetClass(Parent2.GetClass());
+            }
 
 
             //Select base radius

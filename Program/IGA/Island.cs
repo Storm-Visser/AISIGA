@@ -86,7 +86,7 @@ namespace AISIGA.Program.IGA
             foreach (Antibody antibody in Antibodies)
             {
                 antibody.AssingRandomClassAndRadius(Config.BaseRadius);
-                antibody.AssignRandomFeatureValuesAndMultipliers(maxValues, minValues, Config.UseHyperSpheres);
+                antibody.AssignRandomFeatureValuesAndMultipliers(maxValues, minValues, Config.UseHyperSpheres, Config.UseUnboundedRegions);
 
             }
         }
@@ -107,8 +107,7 @@ namespace AISIGA.Program.IGA
             // Sort the antibodies by fitness
             SortByFitness();
             // Remove the excess antibodies
-            this.Antibodies = this.Antibodies.Take((int)(this.Antigens.Count * Config.PopulationSizeFractionOfDatapoints) / Config.NumberOfIslands).ToList();
-
+            ReplaceByClass();
         }
 
         public void Migrate()
@@ -140,8 +139,8 @@ namespace AISIGA.Program.IGA
             for (int i = 0; i < NumberOfParents; i += 2)
             {
                 // Perform crossover
-                Antibody parent1 = Antibodies[i];
-                Antibody parent2 = Antibodies[i + 1];
+                Antibody parent1 = EVOFunctions.TournamentSelect(Antibodies, Config.TournamentSize);
+                Antibody parent2 = EVOFunctions.TournamentSelect(Antibodies, Config.TournamentSize);
                 (Antibody child1, Antibody child2) = EVOFunctions.CrossoverAntibodies(parent1, parent2);
 
                 // Mutate the children
@@ -151,7 +150,7 @@ namespace AISIGA.Program.IGA
                 }
                 if (RandomProvider.GetThreadRandom().NextDouble() < Config.MutationRate)
                 {
-                    child1 = EVOFunctions.MutateAntibody(child1);
+                    child2 = EVOFunctions.MutateAntibody(child2);
                 }
 
                 // Add the children back to the population
@@ -161,8 +160,38 @@ namespace AISIGA.Program.IGA
             // Sort the antibodies by fitness
             SortByFitness();
             // Remove the excess antibodies
-            this.Antibodies = this.Antibodies.Take((int)(this.Antigens.Count * Config.PopulationSizeFractionOfDatapoints) / Config.NumberOfIslands).ToList();
+            ReplaceByClass();
         }
+
+
+        public void ReplaceByClass()
+        {
+            int classCount = LabelEncoder.ClassCount;
+            int populationPerClass = (int)((this.Antigens.Count * Config.PopulationSizeFractionOfDatapoints) / Config.NumberOfIslands) / classCount;
+
+            Dictionary<int, List<Antibody>> classGroups = new();
+
+            // Initialize class groups
+            for (int i = 0; i < classCount; i++)
+                classGroups[i] = new List<Antibody>();
+
+            // Group antibodies by class
+            foreach (var ab in Antibodies)
+            {
+                classGroups[ab.GetClass()].Add(ab);
+            }
+
+            // Trim each group to desired size
+            List<Antibody> balancedPopulation = new();
+            foreach (var kvp in classGroups)
+            {
+                var sorted = kvp.Value.OrderByDescending(ab => ab.GetFitness().GetTotalFitness()).ToList();
+                balancedPopulation.AddRange(sorted.Take(populationPerClass));
+            }
+
+            Antibodies = balancedPopulation;
+        }
+
 
 
         private double CalculateAntibodyFitness(Antibody antibody, List<Antibody> allAntibodies, List<Antigen> allAntigens)
@@ -188,7 +217,7 @@ namespace AISIGA.Program.IGA
                     + antibody.GetFitness().GetCoverage()
                     + antibody.GetFitness().GetUniqueness()
                     + antibody.GetFitness().GetValidAvidity()
-                    + antibody.GetFitness().GetInvalidAvidity());
+                    - antibody.GetFitness().GetInvalidAvidity());
                 antibody.GetFitness().SetIsCalculated(true);
                 return antibody.GetFitness().GetTotalFitness();
 

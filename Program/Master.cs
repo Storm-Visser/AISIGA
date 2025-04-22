@@ -74,7 +74,7 @@ namespace AISIGA.Program
         private void InitAntigensAndAntibodies()
         {
             //Create the Antigens and Antibodies
-            this.Antigens = Data.DataHandler.TranslateDataToAntigens(Config.DataSetNr, Config.TrainingTestSplit);
+            this.Antigens = Data.DataHandler.TranslateDataToAntigens(Config.DataSetNr);
             this.Antigens = this.Antigens.OrderBy(x => RandomProvider.GetThreadRandom().Next()).ToList();
         }
 

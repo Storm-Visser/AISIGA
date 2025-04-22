@@ -101,7 +101,7 @@ namespace AISIGA.Program.AIS
         }
 
 
-        public void AssignRandomFeatureValuesAndMultipliers(double[] MaxFeatureValues, double[] MinFeatureValues, bool useHyperSpheres)
+        public void AssignRandomFeatureValuesAndMultipliers(double[] MaxFeatureValues, double[] MinFeatureValues, bool useHyperSpheres, bool useUnbounded)
         {
             for (int i = 0; i < FeatureValues.Length; i++)
             {
@@ -114,7 +114,14 @@ namespace AISIGA.Program.AIS
                 {
                     FeatureMultipliers[i] = (RandomProvider.GetThreadRandom().NextDouble() * 1.9) + 0.1;
                 }
-                FeatureDimTypes[i] = RandomProvider.GetThreadRandom().Next(0, 3);
+                if (useUnbounded)
+                {
+                    FeatureDimTypes[i] = RandomProvider.GetThreadRandom().Next(0, 3);
+                }
+                else
+                {
+                    FeatureDimTypes[i] = 0;
+                }
             }
         }
 

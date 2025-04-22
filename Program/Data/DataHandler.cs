@@ -12,7 +12,7 @@ namespace AISIGA.Program.Data
 {
     static class DataHandler
     {
-        public static List<Antigen> TranslateDataToAntigens(int DataSetNr, double TestTrainSplit)
+        public static List<Antigen> TranslateDataToAntigens(int DataSetNr)
         {
             List<Antigen> Antigens = new List<Antigen>();
 

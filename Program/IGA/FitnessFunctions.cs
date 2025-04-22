@@ -48,7 +48,7 @@ namespace AISIGA.Program.IGA
                     matchedCount++;
                 }
             }
-            if (matchedCount == 0) return 0.0;
+            if (matchedCount == 0) return .0;
             return totalAvidity / matchedCount;
         }
 
@@ -65,8 +65,8 @@ namespace AISIGA.Program.IGA
                     matchedCount++;
                 }
             }
-            if (matchedCount == 0) return 0.0;
-            return (totalAvidity / matchedCount) * -1;
+            if (matchedCount == 0) return 1.0;
+            return (totalAvidity / matchedCount);
         }
 
         public static (double, double) CalculateTotalFitness(List<Antigen> antigens)
@@ -263,7 +263,8 @@ namespace AISIGA.Program.IGA
                 }
             }
 
-            return TotalAGsOfSameClass == 0 ? 1 : TotalAGsOfSameClass;
+            if (TotalAGsOfSameClass == 0) return 0;
+            return TotalAGsOfSameClass;
         }
     }
 }
