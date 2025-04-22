@@ -186,7 +186,6 @@ namespace AISIGA.Program.IGA
 
         public void RunGeneration()
         {
-            SortByFitness();
             // Save clas distribution for later 
             Dictionary<int, int> originalClassDistribution = Antibodies
                 .GroupBy(ab => ab.GetClass())

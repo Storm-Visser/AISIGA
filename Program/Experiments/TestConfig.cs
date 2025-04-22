@@ -10,7 +10,7 @@ namespace AISIGA.Program.Experiments
     {
         public override int NumberOfGenerations => 100;
         public override double PopulationSizeFractionOfDatapoints => 1.0;
-        public override int TournamentSize => 2;
+        public override int TournamentSize => 3;
         public override double PercentageOfParents => 0.2;
         public override int DataSetNr => 0; 
         public override int NumberOfIslands => 4;
@@ -33,6 +33,6 @@ namespace AISIGA.Program.Experiments
         public override bool UseUnboundedRegions => true;
         public override double RateOfUnboundedRegions => 0.2;
         public override bool UseAffinityMaturationMutation => false;
-        public override double BaseRadius => 0.2;
+        public override double BaseRadius => 0.3;
     }
 }
