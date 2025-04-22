@@ -122,9 +122,11 @@ namespace AISIGA.Program.IGA
             // Add migrants
             this.Antibodies.AddRange(migrants);
             // Sort the antibodies by fitness
-            SortByFitness();
+            Dictionary<int, int> originalClassDistribution = Antibodies
+                .GroupBy(ab => ab.GetClass())
+                .ToDictionary(g => g.Key, g => g.Count());
             // Remove the excess antibodies
-            ReplaceByClass();
+            ReplaceByClass(originalClassDistribution);
         }
 
         public void Migrate()
@@ -151,6 +153,11 @@ namespace AISIGA.Program.IGA
         public void RunGeneration()
         {
             SortByFitness();
+            // Save clas distribution for later 
+            Dictionary<int, int> originalClassDistribution = Antibodies
+                .GroupBy(ab => ab.GetClass())
+                .ToDictionary(g => g.Key, g => g.Count());
+
             // Select the best antibodies
             int NumberOfParents = (int)(Config.PercentageOfParents * ((this.Antigens.Count * Config.PopulationSizeFractionOfDatapoints) / Config.NumberOfIslands));
             for (int i = 0; i < NumberOfParents; i += 2)
@@ -177,60 +184,49 @@ namespace AISIGA.Program.IGA
             // Sort the antibodies by fitness
             SortByFitness();
             // Remove the excess antibodies
-            ReplaceByClass();
+            ReplaceByClass(originalClassDistribution);
         }
 
 
-        public void ReplaceByClass()
+        public void ReplaceByClass(Dictionary<int, int> originalClassDistribution)
         {
-            int classCount = LabelEncoder.ClassCount;
+            // Get the class groups (including children)
+            Dictionary<int, List<Antibody>> classGroups = Antibodies
+                .GroupBy(ab => ab.GetClass())
+                .ToDictionary(g => g.Key, g => g.OrderByDescending(ab => ab.GetFitness().GetTotalFitness()).ToList());
 
-            // Get the actual class distribution from the population
-            Dictionary<int, int> classDistribution = new Dictionary<int, int>();
-            foreach (var antibody in Antibodies)
-            {
-                int classId = antibody.GetClass();
-                if (classDistribution.ContainsKey(classId))
-                    classDistribution[classId]++;
-                else
-                    classDistribution[classId] = 1;
-            }
-
-            // Dynamically adjust the population for each class
-            Dictionary<int, List<Antibody>> classGroups = new Dictionary<int, List<Antibody>>();
-
-            // Group antibodies by class
-            foreach (var antibody in Antibodies)
-            {
-                int classId = antibody.GetClass();
-                if (!classGroups.ContainsKey(classId))
-                    classGroups[classId] = new List<Antibody>();
-                classGroups[classId].Add(antibody);
-            }
-
-            // Create the balanced population while respecting the class distribution
+            // Create final balanced population
             List<Antibody> balancedPopulation = new List<Antibody>();
+
+            // Total target size
+            int totalTargetSize = (int)(this.Antigens.Count * Config.PopulationSizeFractionOfDatapoints);
+
+            // Sum of original class distribution
+            double totalOriginal = originalClassDistribution.Values.Sum();
 
             foreach (var kvp in classGroups)
             {
                 int classId = kvp.Key;
-                var antibodiesInClass = kvp.Value;
+                List<Antibody> sorted = kvp.Value;
 
-                // Calculate the target population for this class
-                double classPopulation = (classDistribution.ContainsKey(classId) ? classDistribution[classId] : 0) / (double)Antibodies.Count;
+                // Fraction of this class in original population
+                double fraction = originalClassDistribution.ContainsKey(classId)
+                    ? (double)originalClassDistribution[classId] / totalOriginal
+                    : 0;
 
-                // Ensure class population is not less than 1
-                classPopulation = Math.Max(classPopulation, 1);
+                // Target population size for this class
+                int targetSize = (int)Math.Round(fraction * totalTargetSize);
 
-                // Sort each group by fitness and trim to match the calculated population size
-                var sortedAntibodies = antibodiesInClass.OrderByDescending(ab => ab.GetFitness().GetTotalFitness()).ToList();
-                balancedPopulation.AddRange(sortedAntibodies.Take((int)Math.Floor(classPopulation)));
+                // Add top antibodies for this class
+                balancedPopulation.AddRange(sorted.Take(targetSize));
             }
 
-            // Ensure total population size matches the expected number of antibodies
-            balancedPopulation = balancedPopulation.Take((int)(this.Antigens.Count * Config.PopulationSizeFractionOfDatapoints) / Config.NumberOfIslands).ToList();
+            // Final size safety net (in case of rounding error)
+            balancedPopulation = balancedPopulation
+                .OrderByDescending(ab => ab.GetFitness().GetTotalFitness())
+                .Take(totalTargetSize)
+                .ToList();
 
-            // Replace the current population with the balanced one
             Antibodies = balancedPopulation;
         }
 
