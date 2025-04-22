@@ -83,27 +83,62 @@ namespace AISIGA.Program.IGA
                 minValues[i] += Config.BaseRadius;
             }
 
-            // Set radius based on the min and max values
-            // And set class based on class distribution
+            
+            // Set AB class based on AG class distribution
+            int totalCount = Antibodies.Count;
+
+            // Calculate target distribution count for each class
+            List<int> targetCounts = classDistributionFractions
+                .Select(fraction => (int)Math.Round(fraction * totalCount))
+                .ToList();
+
+            // Force each class to have at least 10 antibodies
+            int extraAdded = 0;
+            foreach (int i in targetCounts)
+            {
+                if (i < 10)
+                {
+                    targetCounts[i] = 10; // Ensure a minimum of 10 antibodies per class
+                    extraAdded += 10;
+                }
+            }
+
+                //Take extra added from the class with the most antibodies
+                if (extraAdded > 0)
+            {
+                int maxIndex = targetCounts
+                    .Select((val, idx) => new { val, idx })
+                    .Where(x => targetCounts[x.idx] > 1)
+                    .OrderByDescending(x => x.val)
+                    .First().idx;
+
+                targetCounts[maxIndex] -= extraAdded;
+            }
+
+            // Start assigning the classes
+            List<int> currentCounts = new List<int>(new int[targetCounts.Count]);
+
+            var rnd = RandomProvider.GetThreadRandom();
             foreach (Antibody antibody in Antibodies)
             {
-                // Select a class based on the distribution
-                double randomValue = RandomProvider.GetThreadRandom().NextDouble();
-                double cumulativeProbability = 0.0;
-                int selectedClass = -1;
-                for (int i = 0; i < classDistributionFractions.Count; i++)
+                List<int> availableClasses = new List<int>();
+
+                // Only pick from classes that haven't reached their target
+                for (int i = 0; i < targetCounts.Count; i++)
                 {
-                    cumulativeProbability += classDistributionFractions[i];
-                    if (randomValue <= cumulativeProbability)
-                    {
-                        selectedClass = i;
-                        break;
-                    }
+                    if (currentCounts[i] < targetCounts[i])
+                        availableClasses.Add(i);
                 }
 
-                antibody.AssingRandomClassAndRadius(Config.BaseRadius, selectedClass);
-                antibody.AssignRandomFeatureValuesAndMultipliers(maxValues, minValues, Config.UseHyperSpheres, Config.UseUnboundedRegions, Config.RateOfUnboundedRegions);
+                // Select one of the remaining classes randomly
+                int selectedClass = availableClasses[rnd.Next(availableClasses.Count)];
 
+                // Assign and update count
+                currentCounts[selectedClass]++;
+
+                antibody.AssingRandomClassAndRadius(Config.BaseRadius, selectedClass);
+                // Also assign the feature values and multipliers
+                antibody.AssignRandomFeatureValuesAndMultipliers(maxValues, minValues, Config.UseHyperSpheres, Config.UseUnboundedRegions, Config.RateOfUnboundedRegions);
             }
         }
 
@@ -118,12 +153,12 @@ namespace AISIGA.Program.IGA
 
         public void RecieveMigration(List<Antibody> migrants)
         {
-            // Add migrants
-            this.Antibodies.AddRange(migrants);
-            // Sort the antibodies by fitness
             Dictionary<int, int> originalClassDistribution = Antibodies
                 .GroupBy(ab => ab.GetClass())
                 .ToDictionary(g => g.Key, g => g.Count());
+            // Add migrants
+            this.Antibodies.AddRange(migrants);
+            // Sort the antibodies by fitness and class
             // Remove the excess antibodies
             ReplaceByClass(originalClassDistribution);
         }

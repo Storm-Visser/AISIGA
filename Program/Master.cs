@@ -23,9 +23,9 @@ namespace AISIGA.Program
     {
         private ExperimentConfig Config { get; set; }
         private List<Island> Islands { get; set; }
-
+        private List<Antibody> BestAntibodyNetwork { get; set; }
+        private double BestAntibodyNetworkFitness { get; set; }
         private List<AIS.Antigen> Antigens { get; set; }
-
         private DashboardWindow DashboardWindow { get; set; } // UI
 
         // UI Variables
@@ -35,6 +35,8 @@ namespace AISIGA.Program
             Config = config;
             EVOFunctions.Config = this.Config;
             FitnessFunctions.Config = this.Config;
+            this.BestAntibodyNetwork = new List<Antibody>();
+            this.BestAntibodyNetworkFitness = -1;
             Islands = new List<Island>();
             Antigens = new List<AIS.Antigen>();
             DashboardWindow = dashboardWindow;
@@ -119,6 +121,22 @@ namespace AISIGA.Program
                 {
                     island.Migrate(); // Shared migration logic
                 }
+                List<Antibody> allAntibodies = GatherAntibodies();
+                VALIS.AssingAGClassByVoting(allAntibodies, this.Antigens);
+                (double newFitness, _) = FitnessFunctions.CalculateTotalFitness(this.Antigens);
+                if (newFitness > BestAntibodyNetworkFitness)
+                {
+                    List<Antibody> CopiedBestAntibodies = new List<Antibody>();
+                    foreach (Antibody AB in allAntibodies)
+                    {
+                        Antibody copyAB = new Antibody(AB.GetClass(), AB.GetBaseRadius(), AB.GetFeatureValues(), AB.GetFeatureMultipliers(), AB.GetFeatureDimTypes(), AB.GetFitness(), true);
+                        CopiedBestAntibodies.Add(copyAB);
+                    }
+                    BestAntibodyNetwork = CopiedBestAntibodies;
+                    BestAntibodyNetworkFitness = newFitness;
+                    System.Diagnostics.Trace.WriteLine("New best network found, starting migration to master");
+                }
+
             });
 
             List<Task> islandTasks = new List<Task>();
@@ -235,7 +253,7 @@ namespace AISIGA.Program
 
         private void CollectResults(bool ShowWindow)
         {
-            VALIS.AssingAGClassByVoting(this.GatherAntibodies(), this.Antigens);
+            VALIS.AssingAGClassByVoting(this.BestAntibodyNetwork, this.Antigens);
 
             // Calculate the fitness of the antibodies
             (double trainFitness, double trainUnassigned) = FitnessFunctions.CalculateTotalFitness(this.Antigens);
@@ -248,7 +266,7 @@ namespace AISIGA.Program
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     ResultsWindow resultsWindow = new ResultsWindow();
-                    resultsWindow.ShowClassificationResults(this.Antigens, trainFitness);
+                    resultsWindow.ShowClassificationResults(this.Antigens, this.BestAntibodyNetworkFitness);
                 });
             }
         }
