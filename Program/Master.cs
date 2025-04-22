@@ -149,7 +149,7 @@ namespace AISIGA.Program
                     {
                         island.RunGeneration(); // Run 1 generation
 
-                        if(gen % (migrationInterval / 3) == 0)
+                        if ((gen + 1) % migrationInterval == 0)
                         {
                             // Update the UI with the results
                             if (island == Islands[0])
@@ -169,10 +169,6 @@ namespace AISIGA.Program
                                 UpdateIslandUI(3);
                                 UpdateTotalUI();
                             }
-                        }
-
-                        if ((gen + 1) % migrationInterval == 0)
-                        {
                             barrier.SignalAndWait(); // Wait for others
                         }
                     }
