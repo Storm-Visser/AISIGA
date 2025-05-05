@@ -10,7 +10,6 @@ namespace AISIGA.Program.Experiments
     {
         public abstract int NumberOfGenerations { get; }
         public abstract double PopulationSizeFractionOfDatapoints { get; }
-        public abstract int TournamentSize { get; }
         public abstract double PercentageOfParents { get; }
         public abstract int DataSetNr { get; }
         public abstract int NumberOfIslands { get; }
@@ -22,6 +21,7 @@ namespace AISIGA.Program.Experiments
         public abstract double MigrationRate { get; }
         public abstract double MigrationFrequency { get; }
 
+        public abstract double BaseRadius { get; }
         public abstract double aScoreMultiplier { get; }
         public abstract double bScoreMultiplier { get; }
         public abstract double cScoreMultiplier { get; }
@@ -31,10 +31,12 @@ namespace AISIGA.Program.Experiments
         public abstract bool UseHyperSpheres { get; }
         public abstract bool UseHyperEllipsoids { get; }
         public abstract bool UseUnboundedRegions{ get; }
-        public abstract double RateOfUnboundedRegions { get; }
         public abstract bool UseAffinityMaturationMutation { get; }
-        public abstract double BaseRadius { get; }
-
+        public abstract bool UseTournamentSelection { get; }
+        public abstract int TournamentSize { get; }
+        public abstract bool UseClassRatioLocking { get; }
+        public abstract bool UseUnboundedRatioLocking { get; }
+        public abstract double RateOfUnboundedRegions { get; }
 
     }
 }

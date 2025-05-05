@@ -12,6 +12,13 @@ namespace AISIGA.Program.IGA
     {
         public static ExperimentConfig? Config { get; set; }
 
+        public static Antibody ElitismSelection(List<Antibody> population)
+        {
+            Antibody bestContestant = population.OrderByDescending(a => a.GetFitness().GetTotalFitness()).First();
+
+            return bestContestant;
+        }
+
         public static Antibody TournamentSelect(List<Antibody> population, int tournamentSize)
         {
             // Randomly select 'tournamentSize' antibodies
@@ -31,13 +38,17 @@ namespace AISIGA.Program.IGA
         }
 
 
-        public static Antibody MutateAntibody(Antibody antibody)
+        public static Antibody MutateAntibody(Antibody antibody, List<Antigen> allAntigens)
         {
             if (Config == null)
             {
                 throw new Exception("Config is not set. Please set the config before calling this function.");
             }
 
+            if (Config.UseAffinityMaturationMutation)
+            {
+                return AffinityMaturationMutation(antibody, allAntigens);
+            }
 
             //Mutate class
             if (RandomProvider.GetThreadRandom().NextDouble() < Config.MutationFrequency)
@@ -208,6 +219,11 @@ namespace AISIGA.Program.IGA
 
             
             return (child1, child2);
+        }
+
+        public static Antibody AffinityMaturationMutation(Antibody child, List<Antigen> allAntigens)
+        {
+            return child;
         }
     }
 }

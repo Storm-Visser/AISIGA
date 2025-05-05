@@ -23,10 +23,9 @@ namespace AISIGA.Program.Tests.MethodTests
         }
         private static void TestHypersphere()
         {
-            // Create a simple 2D antibody centered at (0, 0) with radius 1 and no multipliers
             double[] abFeatureValues = new double[] { 5.0, 5.0 };
-            double[] abMultipliers = new double[] { 1.0, 1.0 }; // No scaling
-            int[] abDimTypes = new int[] { 0, 0 }; // Assume 0 = bounded (Circle)
+            double[] abMultipliers = new double[] { 1.0, 1.0 };
+            int[] abDimTypes = new int[] { 0, 0 };
 
             Antibody ab = new Antibody(0, 1.0, abFeatureValues, abMultipliers, abDimTypes, new Fitness(), true);
 

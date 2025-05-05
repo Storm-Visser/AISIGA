@@ -20,6 +20,7 @@ namespace AISIGA.Program.Tests.MethodTests
             Antibody testAB = new Antibody(0,1,3);
             testAB.AssignRandomFeatureValuesAndMultipliers([2.0, 2.0, 2.0], [-2.0, -2.0, -2.0], config.UseHyperSpheres, config.UseUnboundedRegions, config.RateOfUnboundedRegions);
             testAB.AssingRandomClassAndRadius(config.BaseRadius, 1);
+            List<Antigen> allAntigens = new List<Antigen>();
 
             System.Diagnostics.Debug.WriteLine("TestAB Before: ");
             System.Diagnostics.Debug.WriteLine($"Class: {testAB.GetClass()}, BaseR: {testAB.GetBaseRadius()}, " +
@@ -27,7 +28,7 @@ namespace AISIGA.Program.Tests.MethodTests
                 $"FM; [{testAB.GetFeatureMultipliers()[0]}, {testAB.GetFeatureMultipliers()[1]}, {testAB.GetFeatureMultipliers()[2]}]");
 
             EVOFunctions.Config = config;
-            EVOFunctions.MutateAntibody(testAB);
+            EVOFunctions.MutateAntibody(testAB, allAntigens);
 
             System.Diagnostics.Debug.WriteLine("TestAB After: ");
             System.Diagnostics.Debug.WriteLine($"Class: {testAB.GetClass()}, BaseR: {testAB.GetBaseRadius()}, " +

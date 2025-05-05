@@ -160,7 +160,14 @@ namespace AISIGA.Program.IGA
             this.Antibodies.AddRange(migrants);
             // Sort the antibodies by fitness and class
             // Remove the excess antibodies
-            ReplaceByClass(originalClassDistribution);
+            if (Config.UseClassRatioLocking)
+            {
+                ReplaceByClass(originalClassDistribution);
+            }
+            else
+            {
+                ReplaceByFitness();
+            }
         }
 
         public void Migrate()
@@ -195,29 +202,51 @@ namespace AISIGA.Program.IGA
             int NumberOfParents = (int)(Config.PercentageOfParents * ((this.Antigens.Count * Config.PopulationSizeFractionOfDatapoints) / Config.NumberOfIslands));
             for (int i = 0; i < NumberOfParents; i += 2)
             {
+                Antibody parent1;
+                Antibody parent2;
                 // Perform crossover
-                Antibody parent1 = EVOFunctions.TournamentSelect(Antibodies, Config.TournamentSize);
-                Antibody parent2 = EVOFunctions.TournamentSelect(Antibodies, Config.TournamentSize);
-                (Antibody child1, Antibody child2) = EVOFunctions.CrossoverAntibodies(parent1, parent2);
-
-                // Mutate the children
-                if (RandomProvider.GetThreadRandom().NextDouble() < Config.MutationRate)
+                if (RandomProvider.GetThreadRandom().NextDouble() < Config.CrossoverRate)
                 {
-                    child1 = EVOFunctions.MutateAntibody(child1);
-                }
-                if (RandomProvider.GetThreadRandom().NextDouble() < Config.MutationRate)
-                {
-                    child2 = EVOFunctions.MutateAntibody(child2);
-                }
+                    if (Config.UseTournamentSelection)
+                    {
+                        // Select parents using tournament selection
+                        parent1 = EVOFunctions.TournamentSelect(Antibodies, Config.TournamentSize);
+                        parent2 = EVOFunctions.TournamentSelect(Antibodies, Config.TournamentSize);
+                    }
+                    else
+                    {
+                        // Select parents using elitism selection
+                        parent1 = EVOFunctions.ElitismSelection(Antibodies);
+                        parent2 = EVOFunctions.ElitismSelection(Antibodies);
+                    }
+                    (Antibody child1, Antibody child2) = EVOFunctions.CrossoverAntibodies(parent1, parent2);
 
-                // Add the children back to the population
-                Antibodies.Add(child1);
-                Antibodies.Add(child2);
+                    // Mutate the children
+                    if (RandomProvider.GetThreadRandom().NextDouble() < Config.MutationRate)
+                    {
+                        child1 = EVOFunctions.MutateAntibody(child1, Antigens);
+                    }
+                    if (RandomProvider.GetThreadRandom().NextDouble() < Config.MutationRate)
+                    {
+                        child2 = EVOFunctions.MutateAntibody(child2, Antigens);
+                    }
+
+                    // Add the children back to the population
+                    Antibodies.Add(child1);
+                    Antibodies.Add(child2);
+                }
             }
             // Sort the antibodies by fitness
             SortByFitness();
             // Remove the excess antibodies
-            ReplaceByClass(originalClassDistribution);
+            if (Config.UseClassRatioLocking)
+            {
+                ReplaceByClass(originalClassDistribution);
+            }
+            else
+            {
+                ReplaceByFitness();
+            }
         }
 
 
@@ -261,6 +290,17 @@ namespace AISIGA.Program.IGA
                 .ToList();
 
             Antibodies = balancedPopulation;
+        }
+
+        public void ReplaceByFitness()
+        {
+            // Total target size
+            int totalTargetSize = (int)(this.Antigens.Count * Config.PopulationSizeFractionOfDatapoints);
+
+            Antibodies = Antibodies
+                .OrderByDescending(ab => ab.GetFitness().GetTotalFitness())
+                .Take(totalTargetSize)
+                .ToList();
         }
 
 
