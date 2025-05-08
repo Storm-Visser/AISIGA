@@ -112,6 +112,7 @@ namespace AISIGA.Program
         public void StartExperiment()
         {
             int islandCount = Islands.Count;
+            int MigCount = 0;
 
             Barrier barrier = new Barrier(islandCount, (b) =>
             {
@@ -121,22 +122,26 @@ namespace AISIGA.Program
                 {
                     island.Migrate(); // Shared migration logic
                 }
-                List<Antibody> allAntibodies = GatherAntibodies();
-                VALIS.AssingAGClassByVoting(allAntibodies, this.Antigens);
-                (double newFitness, _) = FitnessFunctions.CalculateTotalFitness(this.Antigens);
-                if (newFitness > BestAntibodyNetworkFitness)
+                MigCount++;
+                if (MigCount >= Config.MasterMigrationFreq)
                 {
-                    List<Antibody> CopiedBestAntibodies = new List<Antibody>();
-                    foreach (Antibody AB in allAntibodies)
+                    List<Antibody> allAntibodies = GatherAntibodies();
+                    VALIS.AssingAGClassByVoting(allAntibodies, this.Antigens);
+                    (double newFitness, _) = FitnessFunctions.CalculateTotalFitness(this.Antigens);
+                    if (newFitness > BestAntibodyNetworkFitness)
                     {
-                        Antibody copyAB = new Antibody(AB.GetClass(), AB.GetBaseRadius(), AB.GetFeatureValues(), AB.GetFeatureMultipliers(), AB.GetFeatureDimTypes(), AB.GetFitness(), true);
-                        CopiedBestAntibodies.Add(copyAB);
+                        List<Antibody> CopiedBestAntibodies = new List<Antibody>();
+                        foreach (Antibody AB in allAntibodies)
+                        {
+                            Antibody copyAB = new Antibody(AB.GetClass(), AB.GetBaseRadius(), AB.GetFeatureValues(), AB.GetFeatureMultipliers(), AB.GetFeatureDimTypes(), AB.GetFitness(), true);
+                            CopiedBestAntibodies.Add(copyAB);
+                        }
+                        BestAntibodyNetwork = CopiedBestAntibodies;
+                        BestAntibodyNetworkFitness = newFitness;
+                        System.Diagnostics.Trace.WriteLine("New best network found, starting migration to master");
                     }
-                    BestAntibodyNetwork = CopiedBestAntibodies;
-                    BestAntibodyNetworkFitness = newFitness;
-                    System.Diagnostics.Trace.WriteLine("New best network found, starting migration to master");
+                    MigCount = 0;
                 }
-
             });
 
             List<Task> islandTasks = new List<Task>();
@@ -151,23 +156,26 @@ namespace AISIGA.Program
 
                         if ((gen + 1) % migrationInterval == 0)
                         {
-                            // Update the UI with the results
-                            if (island == Islands[0])
+                            if (Config.UseUI)
                             {
-                                UpdateIslandUI(0);
-                            }
-                            else if (island == Islands[1])
-                            {
-                                UpdateIslandUI(1);
-                            }
-                            else if (island == Islands[2])
-                            {
-                                UpdateIslandUI(2);
-                            }
-                            else if (island == Islands[3])
-                            {
-                                UpdateIslandUI(3);
-                                UpdateTotalUI();
+                                // Update the UI with the results
+                                if (island == Islands[0])
+                                {
+                                    UpdateIslandUI(0);
+                                }
+                                else if (island == Islands[1])
+                                {
+                                    UpdateIslandUI(1);
+                                }
+                                else if (island == Islands[2])
+                                {
+                                    UpdateIslandUI(2);
+                                }
+                                else if (island == Islands[3])
+                                {
+                                    UpdateIslandUI(3);
+                                    UpdateTotalUI();
+                                }
                             }
                             barrier.SignalAndWait(); // Wait for others
                         }

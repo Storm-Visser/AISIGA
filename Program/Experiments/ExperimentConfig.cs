@@ -8,6 +8,8 @@ namespace AISIGA.Program.Experiments
 {
     abstract class ExperimentConfig
     {
+        public abstract bool UseUI { get; }
+
         public abstract int NumberOfGenerations { get; }
         public abstract double PopulationSizeFractionOfDatapoints { get; }
         public abstract double PercentageOfParents { get; }
@@ -20,6 +22,7 @@ namespace AISIGA.Program.Experiments
         public abstract double CrossoverFrequency { get; }
         public abstract double MigrationRate { get; }
         public abstract double MigrationFrequency { get; }
+        public abstract double MasterMigrationFreq { get; }
 
         public abstract double BaseRadius { get; }
         public abstract double aScoreMultiplier { get; }
