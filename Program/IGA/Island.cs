@@ -133,6 +133,11 @@ namespace AISIGA.Program.IGA
                 // Select one of the remaining classes randomly
                 int selectedClass = availableClasses[rnd.Next(availableClasses.Count)];
 
+                if (!Config.UseClassRatioLocking)
+                {
+                    selectedClass = rnd.Next(0, LabelEncoder.ClassCount);
+                }
+
                 // Assign and update count
                 currentCounts[selectedClass]++;
 
@@ -295,7 +300,7 @@ namespace AISIGA.Program.IGA
         public void ReplaceByFitness()
         {
             // Total target size
-            int totalTargetSize = (int)(this.Antigens.Count * Config.PopulationSizeFractionOfDatapoints);
+            int totalTargetSize = (int)(this.Antigens.Count * Config.PopulationSizeFractionOfDatapoints );
 
             Antibodies = Antibodies
                 .OrderByDescending(ab => ab.GetFitness().GetTotalFitness())
