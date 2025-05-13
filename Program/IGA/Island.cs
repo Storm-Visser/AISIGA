@@ -300,7 +300,7 @@ namespace AISIGA.Program.IGA
         public void ReplaceByFitness()
         {
             // Total target size
-            int totalTargetSize = (int)(this.Antigens.Count * Config.PopulationSizeFractionOfDatapoints );
+            int totalTargetSize = (int)(this.Antigens.Count * Config.PopulationSizeFractionOfDatapoints);
 
             Antibodies = Antibodies
                 .OrderByDescending(ab => ab.GetFitness().GetTotalFitness())

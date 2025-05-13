@@ -96,7 +96,7 @@ namespace AISIGA.Program.Tests.MethodTests
                 baseRadius: 1.0,
                 featureValues: new double[] { 5.0, 5.0 },
                 featureMultipliers: new double[] { 0.5, 3 },
-                featureDimTypes: new int[] { 1, 0 },
+                featureDimTypes: new int[] { 2, 0 },
                 fitness: new Fitness(),
                 IsCalculationStillValid: true
             );
@@ -133,7 +133,7 @@ namespace AISIGA.Program.Tests.MethodTests
                 baseRadius: 1.0,
                 featureValues: new double[] { 5.0, 5.0 },
                 featureMultipliers: new double[] { 0.5, 3 },
-                featureDimTypes: new int[] { 2, 0 },
+                featureDimTypes: new int[] { 1, 0 },
                 fitness: new Fitness(),
                 IsCalculationStillValid: true
             );

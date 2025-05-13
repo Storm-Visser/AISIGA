@@ -134,8 +134,8 @@ namespace AISIGA.Program.IGA
             }
 
             // Create new antibodies
-            Antibody child1 = new Antibody(Parent1.GetClass(), -1, Parent1.GetFeatureMultipliers().Length);
-            Antibody child2 = new Antibody(Parent2.GetClass(), -1, Parent2.GetFeatureMultipliers().Length);
+            Antibody child1 = new Antibody(0,0, Parent1.GetFeatureMultipliers().Length);
+            Antibody child2 = new Antibody(0,0, Parent2.GetFeatureMultipliers().Length);
 
             //Select class
             if (RandomProvider.GetThreadRandom().NextDouble() < Config.CrossoverFrequency)

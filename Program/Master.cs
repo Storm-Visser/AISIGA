@@ -235,12 +235,12 @@ namespace AISIGA.Program
         {
             double[] metrics = new double[6];
             if (main) { metrics = new double[7]; }
-            metrics[0] = antibodies.Average(a => a.GetFitness().GetTotalFitness());
-            metrics[1] = antibodies.Average(a => a.GetFitness().GetCorrectness());
-            metrics[2] = antibodies.Average(a => a.GetFitness().GetCoverage());
-            metrics[3] = antibodies.Average(a => a.GetFitness().GetUniqueness());
-            metrics[4] = antibodies.Average(a => a.GetFitness().GetValidAvidity());
-            metrics[5] = antibodies.Average(a => a.GetFitness().GetInvalidAvidity());
+            metrics[0] = antibodies.Average(a => a.GetFitness().GetTotalFitness()) *10;
+            metrics[1] = antibodies.Average(a => a.GetFitness().GetCorrectness()) * 10;
+            metrics[2] = antibodies.Average(a => a.GetFitness().GetCoverage()) * 10;
+            metrics[3] = antibodies.Average(a => a.GetFitness().GetUniqueness()) * 10;
+            metrics[4] = antibodies.Average(a => a.GetFitness().GetValidAvidity()) * 10;
+            metrics[5] = antibodies.Average(a => a.GetFitness().GetInvalidAvidity()) * 10;
             if (main)
             {
                 VALIS.AssingAGClassByVoting(this.GatherAntibodies(), this.Antigens);
@@ -287,6 +287,7 @@ namespace AISIGA.Program
                         totalOfClass += 1;
                     }
                 }
+                //System.Diagnostics.Trace.WriteLine($"Class {i}: {totalOfClass}");
                 System.Diagnostics.Trace.WriteLine($"Class {i}: {totalOfClass / (this.Islands[0].GetAntibodies().Count * 4)}");
             }
         }

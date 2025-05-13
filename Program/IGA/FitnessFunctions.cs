@@ -65,8 +65,8 @@ namespace AISIGA.Program.IGA
                     matchedCount++;
                 }
             }
-            if (matchedCount == 0) return 1.0;
-            return (totalAvidity / matchedCount);
+            if (matchedCount == 0) return 0.0;
+            return (totalAvidity / matchedCount) * -1;
         }
 
         public static (double, double) CalculateTotalFitness(List<Antigen> antigens)

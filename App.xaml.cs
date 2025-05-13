@@ -22,7 +22,6 @@ public partial class App : Application
     {
         base.OnStartup(e);
         #if DEBUG
-                // Run your test class here
                 //Tests.Run();
                 System.Diagnostics.Trace.WriteLine("Done With Tests, Now starting program");
         #endif
