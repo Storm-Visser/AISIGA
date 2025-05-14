@@ -27,13 +27,28 @@ namespace AISIGA.Program.Data
                     labelIndex = 2;
                     break;
                 case 1:
-                    // Load the first dataset
+                    filePath = "Program/Data/Datasets/wine.data";
+                    labelIndex = 0;
                     break;
                 case 2:
-                    // Load the second dataset
+                    filePath = "Program/Data/Datasets/diabetes.csv";
+                    labelIndex = 8;
                     break;
                 case 3:
-                    // Load the third dataset
+                    filePath = "Program/Data/Datasets/ionosphere.data";
+                    labelIndex = 0;
+                    break;
+                case 4:
+                    filePath = "Program/Data/Datasets/sonar.txt";
+                    labelIndex = 60;
+                    break;
+                case 5:
+                    filePath = "Program/Data/Datasets/iris.data";
+                    labelIndex = 4;
+                    break;
+                case 6:
+                    filePath = "Program/Data/Datasets/glass.data";
+                    labelIndex = 9;
                     break;
                 default:
                     throw new ArgumentException("Invalid dataset number");
