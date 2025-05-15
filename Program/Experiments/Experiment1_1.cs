@@ -10,6 +10,7 @@ namespace AISIGA.Program.Experiments
     {
         public override bool UseUI => true;
         public override int KFoldCount => 5;
+
         public override int NumberOfGenerations => 2000;
         public override double PopulationSizeFractionOfDatapoints => 1;
         public override double PercentageOfParents => 0.2;

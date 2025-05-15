@@ -17,6 +17,8 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using System.Xml.Serialization;
 using System.Diagnostics;
+using AISIGA.Program.Experiments.ExpResults;
+using System.IO;
 
 namespace AISIGA.Program
 {
@@ -25,10 +27,12 @@ namespace AISIGA.Program
         private AbstractExperimentConfig Config { get; set; }
         private List<Island> Islands { get; set; }
         private List<Antibody> BestAntibodyNetwork { get; set; }
-        private double BestAntibodyNetworkFitness { get; set; }
+        private double BestAntibodyNetworkTestAccuracy { get; set; }
+        private double BestAntibodyNetworkTrainAccuracy { get; set; }
         private List<AIS.Antigen> TrainAntigens { get; set; }
         private List<AIS.Antigen> TestAntigens { get; set; }
         private DashboardWindow DashboardWindow { get; set; } // UI
+        private bool shownUI { get; set; }
 
         // UI Variables
 
@@ -38,18 +42,19 @@ namespace AISIGA.Program
             EVOFunctions.Config = this.Config;
             FitnessFunctions.Config = this.Config;
             this.BestAntibodyNetwork = new List<Antibody>();
-            this.BestAntibodyNetworkFitness = -1;
+            this.BestAntibodyNetworkTestAccuracy = -1;
+            this.BestAntibodyNetworkTrainAccuracy = -1;
             Islands = new List<Island>();
             TrainAntigens = new List<AIS.Antigen>();
             DashboardWindow = dashboardWindow;
+            shownUI = false;
         }
 
         public void Initialize()
         {
-
             List<Antigen> allAntigens = Data.DataHandler.TranslateDataToAntigens(Config.DataSetNr);
-
-            for (int run = 0; run < 20; run++)
+            List<Result> results = new List<Result>();
+            for (int run = 0; run < 2; run++)
             {
                 List<(List<Antigen> Train, List<Antigen> Test)> folds = Data.DataHandler.GenerateStratifiedKFolds(allAntigens, Config.KFoldCount);
 
@@ -64,17 +69,26 @@ namespace AISIGA.Program
                     StartExperiment();
                     stopwatch.Stop();
                     System.Diagnostics.Trace.WriteLine($"Run {run + 1}, Fold {i + 1}: Elapsed time: {stopwatch.Elapsed.TotalSeconds} seconds");
+                    System.Diagnostics.Trace.WriteLine($"Run {run + 1}, Fold {i + 1}: Test Accuracy: {BestAntibodyNetworkTestAccuracy}%");
+                    System.Diagnostics.Trace.WriteLine($"Run {run + 1}, Fold {i + 1}: Train Accuracy: {BestAntibodyNetworkTrainAccuracy}%");
+                    results.Add(new Result(run, i, BestAntibodyNetworkTestAccuracy, BestAntibodyNetworkTrainAccuracy, stopwatch.Elapsed.TotalSeconds));
                     this.Reset();
-                    if (Config.UseUI)
+                    if (Config.UseUI && !shownUI)
                     {
                         Application.Current.Dispatcher.Invoke(() =>
                         {
                             this.DashboardWindow = new DashboardWindow();
                             this.DashboardWindow.Show();
                         });
+                        //stop creating new windows after one run/fold
+                        shownUI = true;
                     }
                 }
             }
+            // Save the results to a file
+            SaveResultsToCsv(results, "results.csv");
+            // Calculate metrics & print them
+            CalculateResultMetrics(results);
         }
 
 
@@ -141,26 +155,47 @@ namespace AISIGA.Program
                     island.Migrate(); // Shared migration logic
                 }
                 MigCount++;
-                if (MigCount >= Config.MasterMigrationFreq)
+                if (Config.MasterMigrationFreq > 0)
                 {
-                    List<Antibody> allAntibodies = GatherAntibodies();
-                    VALIS.AssingAGClassByVoting(allAntibodies, this.TestAntigens);
-                    (double newFitness, _) = FitnessFunctions.CalculateTotalFitness(this.TestAntigens);
-                    if (newFitness > BestAntibodyNetworkFitness)
+                    if (MigCount >= Config.MasterMigrationFreq)
                     {
-                        List<Antibody> CopiedBestAntibodies = new List<Antibody>();
-                        foreach (Antibody AB in allAntibodies)
+                        List<Antibody> allAntibodies = GatherAntibodies();
+                        VALIS.AssingAGClassByVoting(allAntibodies, this.TestAntigens);
+                        (double newFitness, _) = FitnessFunctions.CalculateTotalFitness(this.TestAntigens);
+                        if (newFitness > BestAntibodyNetworkTestAccuracy)
                         {
-                            Antibody copyAB = new Antibody(AB.GetClass(), AB.GetBaseRadius(), AB.GetFeatureValues(), AB.GetFeatureMultipliers(), AB.GetFeatureDimTypes(), AB.GetFitness(), true);
-                            CopiedBestAntibodies.Add(copyAB);
+                            List<Antibody> CopiedBestAntibodies = new List<Antibody>();
+                            foreach (Antibody AB in allAntibodies)
+                            {
+                                Antibody copyAB = new Antibody(AB.GetClass(), AB.GetBaseRadius(), AB.GetFeatureValues(), AB.GetFeatureMultipliers(), AB.GetFeatureDimTypes(), AB.GetFitness(), true);
+                                CopiedBestAntibodies.Add(copyAB);
+                            }
+                            BestAntibodyNetwork = CopiedBestAntibodies;
+                            BestAntibodyNetworkTestAccuracy = newFitness;
+                            (BestAntibodyNetworkTrainAccuracy, _) = FitnessFunctions.CalculateTotalFitness(this.TrainAntigens);
                         }
-                        BestAntibodyNetwork = CopiedBestAntibodies;
-                        BestAntibodyNetworkFitness = newFitness;
+                        MigCount = 0;
                     }
-                    MigCount = 0;
                 }
-            });
+                if (Config.UseUI && !shownUI)
+                {
+                    List<Antibody> antibodies = this.GatherAntibodies();
+                    VALIS.AssingAGClassByVoting(antibodies, this.TrainAntigens);
+                    (double trainAcc, _) = FitnessFunctions.CalculateTotalFitness(this.TrainAntigens);
+                    VALIS.AssingAGClassByVoting(antibodies, this.TestAntigens);
+                    (double testAcc, _) = FitnessFunctions.CalculateTotalFitness(this.TestAntigens);
+                    // Update the UI with the results
+                    UpdateIslandUI(0);
+                    UpdateIslandUI(1);
+                    UpdateIslandUI(2);
+                    UpdateIslandUI(3);
+                    UpdateTotalUI(antibodies, trainAcc, testAcc);
+                }
+                shownUI = true; // Set to true after the first migration
+            })
+            {
 
+            };
             List<Task> islandTasks = new List<Task>();
             int migrationInterval = (int)(Config.MigrationFrequency * Config.NumberOfGenerations);
             foreach (var island in Islands)
@@ -173,27 +208,6 @@ namespace AISIGA.Program
 
                         if ((gen + 1) % migrationInterval == 0)
                         {
-                            if (Config.UseUI)
-                            {
-                                // Update the UI with the results
-                                if (island == Islands[0])
-                                {
-                                    UpdateIslandUI(0);
-                                }
-                                else if (island == Islands[1])
-                                {
-                                    UpdateIslandUI(1);
-                                }
-                                else if (island == Islands[2])
-                                {
-                                    UpdateIslandUI(2);
-                                }
-                                else if (island == Islands[3])
-                                {
-                                    UpdateIslandUI(3);
-                                    UpdateTotalUI();
-                                }
-                            }
                             barrier.SignalAndWait(); // Wait for others
                         }
                     }
@@ -202,7 +216,8 @@ namespace AISIGA.Program
                 islandTasks.Add(task);
             }
 
-            Task.WaitAll(islandTasks.ToArray());
+            Task.WaitAll(islandTasks.ToArray());           
+
 
             //Done Threading
             CollectResults(true);
@@ -234,20 +249,20 @@ namespace AISIGA.Program
             // Update the UI with the results
             DashboardWindow.Dispatcher.Invoke(() =>
             {
-                DashboardWindow.AddToSeries(target, CalculateUIMetrics(antibodies, false));
+                DashboardWindow.AddToSeries(target, CalculateUIMetrics(antibodies, false, 0, 0));
             });
         }
         
-        private void UpdateTotalUI()
+        private void UpdateTotalUI(List<Antibody> antibodies, double testAcc, double trainAcc)
         {
             // Update the UI with the results
             DashboardWindow.Dispatcher.Invoke(() =>
             {
-                DashboardWindow.AddToSeries(DashboardWindow.LargeSeries, CalculateUIMetrics(this.GatherAntibodies(), true));
+                DashboardWindow.AddToSeries(DashboardWindow.LargeSeries, CalculateUIMetrics(antibodies, true, testAcc, trainAcc));
             });
         }
 
-        private double[] CalculateUIMetrics(List<Antibody> antibodies, bool main)
+        private double[] CalculateUIMetrics(List<Antibody> antibodies, bool main, double TestAcc, double TrainAcc)
         {
             double[] metrics = new double[6];
             if (main) { metrics = new double[8]; }
@@ -259,10 +274,8 @@ namespace AISIGA.Program
             metrics[5] = antibodies.Average(a => a.GetFitness().GetInvalidAvidity()) * 10;
             if (main)
             {
-                VALIS.AssingAGClassByVoting(this.GatherAntibodies(), this.TrainAntigens);
-                (metrics[6], _) = FitnessFunctions.CalculateTotalFitness(this.TrainAntigens);
-                VALIS.AssingAGClassByVoting(this.GatherAntibodies(), this.TestAntigens);
-                (metrics[7], _) = FitnessFunctions.CalculateTotalFitness(this.TestAntigens);
+                metrics[6] = TestAcc;
+                metrics[7] = TrainAcc;
             }
 
             return metrics;
@@ -275,20 +288,34 @@ namespace AISIGA.Program
 
         private void CollectResults(bool ShowWindow)
         {
+            if (Config.MasterMigrationFreq == 0)
+            {
+                List<Antibody> allAntibodies = GatherAntibodies();
+                VALIS.AssingAGClassByVoting(allAntibodies, this.TestAntigens);
+                (double newFitness, _) = FitnessFunctions.CalculateTotalFitness(this.TestAntigens);
+
+                List<Antibody> CopiedBestAntibodies = new List<Antibody>();
+                foreach (Antibody AB in allAntibodies)
+                {
+                    Antibody copyAB = new Antibody(AB.GetClass(), AB.GetBaseRadius(), AB.GetFeatureValues(), AB.GetFeatureMultipliers(), AB.GetFeatureDimTypes(), AB.GetFitness(), true);
+                    CopiedBestAntibodies.Add(copyAB);
+                }
+                BestAntibodyNetwork = CopiedBestAntibodies;
+                BestAntibodyNetworkTestAccuracy = newFitness;
+            }
+
             VALIS.AssingAGClassByVoting(this.BestAntibodyNetwork, this.TrainAntigens);
+            (double trainFitness, _) = FitnessFunctions.CalculateTotalFitness(this.TrainAntigens);
+            this.BestAntibodyNetworkTrainAccuracy = trainFitness;
 
-            // Calculate the fitness of the antibodies
-            (double trainFitness, double trainUnassigned) = FitnessFunctions.CalculateTotalFitness(this.TrainAntigens);
 
-            System.Diagnostics.Trace.WriteLine(trainFitness);
-            System.Diagnostics.Trace.WriteLine(trainUnassigned);
             //ShowClassDistribution();
             if (ShowWindow && Config.UseUI)
             {
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     ResultsWindow resultsWindow = new ResultsWindow();
-                    resultsWindow.ShowClassificationResults(this.TrainAntigens, this.BestAntibodyNetworkFitness);
+                    resultsWindow.ShowClassificationResults(this.TestAntigens, this.BestAntibodyNetworkTestAccuracy);
                 });
             }
 
@@ -311,11 +338,74 @@ namespace AISIGA.Program
             }
         }
 
+        private void SaveResultsToCsv(List<Result> results, string filePath)
+        {
+            var sb = new StringBuilder();
+
+            // Write CSV header
+            sb.AppendLine("RunNumber,FoldNumber,TestAccuracy,TrainAccuracy,Time");
+
+            // Write each result as a CSV row
+            foreach (var r in results)
+            {
+                sb.AppendLine($"{r.RunNumber},{r.FoldNumber},{r.TestAccuracy},{r.TrainAccuracy},{r.Time}");
+            }
+
+            // Write to file
+            File.WriteAllText(filePath, sb.ToString());
+        }
+
+        private void CalculateResultMetrics(List<Result> results)
+        {
+            // Average and std dev per fold
+            var metricsPerFold = results
+                .GroupBy(r => r.FoldNumber)
+                .Select(g => new
+                {
+                    Fold = g.Key,
+                    AvgTestAccuracy = g.Average(r => r.TestAccuracy),
+                    StdDevTestAccuracy = Math.Sqrt(g.Select(r => Math.Pow(r.TestAccuracy - g.Average(x => x.TestAccuracy), 2)).Average()),
+                    AvgTrainAccuracy = g.Average(r => r.TrainAccuracy),
+                    StdDevTrainAccuracy = Math.Sqrt(g.Select(r => Math.Pow(r.TrainAccuracy - g.Average(x => x.TrainAccuracy), 2)).Average()),
+                    AvgTime = g.Average(r => r.Time),
+                    StdDevTime = Math.Sqrt(g.Select(r => Math.Pow(r.Time - g.Average(x => x.Time), 2)).Average())
+                })
+                .ToList();
+
+            foreach (var foldMetrics in metricsPerFold)
+            {
+                System.Diagnostics.Trace.WriteLine(
+                    $"Fold {foldMetrics.Fold}: " +
+                    $"Test Acc = {foldMetrics.AvgTestAccuracy:F2} ± {foldMetrics.StdDevTestAccuracy:F2}, " +
+                    $"Train Acc = {foldMetrics.AvgTrainAccuracy:F2} ± {foldMetrics.StdDevTrainAccuracy:F2}, " +
+                    $"Time = {foldMetrics.AvgTime:F2}s ± {foldMetrics.StdDevTime:F2}s");
+            }
+
+            // Overall average and std dev across all folds and runs
+            double avgTestAccuracy = results.Average(r => r.TestAccuracy);
+            double stdDevTestAccuracy = Math.Sqrt(results.Select(r => Math.Pow(r.TestAccuracy - avgTestAccuracy, 2)).Average());
+
+            double avgTrainAccuracy = results.Average(r => r.TrainAccuracy);
+            double stdDevTrainAccuracy = Math.Sqrt(results.Select(r => Math.Pow(r.TrainAccuracy - avgTrainAccuracy, 2)).Average());
+
+            double avgTime = results.Average(r => r.Time);
+            double stdDevTime = Math.Sqrt(results.Select(r => Math.Pow(r.Time - avgTime, 2)).Average());
+
+            System.Diagnostics.Trace.WriteLine(
+                $"Overall Test Accuracy: {avgTestAccuracy:F2} ± {stdDevTestAccuracy:F2}");
+            System.Diagnostics.Trace.WriteLine(
+                $"Overall Train Accuracy: {avgTrainAccuracy:F2} ± {stdDevTrainAccuracy:F2}");
+            System.Diagnostics.Trace.WriteLine(
+                $"Overall Time: {avgTime:F2} seconds ± {stdDevTime:F2} seconds");
+        }
+
+
         private void Reset()
         {
             this.Islands.Clear(); // Clear the islands for the next fold
             this.BestAntibodyNetwork.Clear();
-            this.BestAntibodyNetworkFitness = -1;
+            this.BestAntibodyNetworkTestAccuracy = -1;
+            this.BestAntibodyNetworkTrainAccuracy = -1;
             this.TrainAntigens.Clear();
             this.TestAntigens.Clear();
         }

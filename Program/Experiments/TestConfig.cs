@@ -23,7 +23,7 @@ namespace AISIGA.Program.Experiments
         public override double CrossoverFrequency => 0.5;
         public override double MigrationRate => 0.1;
         public override double MigrationFrequency => 0.05;
-        public override double MasterMigrationFreq => 1;
+        public override double MasterMigrationFreq => 0;
 
         public override double BaseRadius => 0.2;
         public override double aScoreMultiplier => 2.0;
@@ -38,7 +38,7 @@ namespace AISIGA.Program.Experiments
         public override bool UseAffinityMaturationMutation => false;
         public override bool UseTournamentSelection => true;
         public override int TournamentSize => 2;
-        public override bool UseClassRatioLocking => true;
+        public override bool UseClassRatioLocking => false;
         public override bool UseUnboundedRatioLocking => false;
         public override double RateOfUnboundedRegions => 0.2;   
 

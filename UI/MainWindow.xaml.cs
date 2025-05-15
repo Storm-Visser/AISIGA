@@ -25,13 +25,17 @@ public partial class MainWindow : Window
 
     private void StartProgram_Click(object sender, RoutedEventArgs e)
     {
-        // Example: Show the dashboard
-        DashboardWindow dashboard = new DashboardWindow();
-        dashboard.Show();
+        
         this.Hide();
 
         // Initialize the experiment configuration & the controller
         AbstractExperimentConfig expConfig = new TestConfig();
+        // Example: Show the dashboard
+        DashboardWindow dashboard = new DashboardWindow();
+        if (expConfig.UseUI)
+        {
+            dashboard.Show();
+        }
         Master master = new Master(expConfig, dashboard);
         Task.Run(() =>
         {

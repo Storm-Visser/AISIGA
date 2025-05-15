@@ -20,12 +20,15 @@ namespace AISIGA.Program.IGA
         private List<AIS.Antibody> Antibodies { get; set; }
         private Island? Neighbour { get; set; }
 
+        public int Generation { get; set; }
+
         public Island(AbstractExperimentConfig config)
         {
             Config = config;
             Antigens = new List<AIS.Antigen>();
             Antibodies = new List<AIS.Antibody>();
             Neighbour = null;
+            Generation = 0;
         }
 
         public List<Antibody> GetAntibodies()
@@ -215,6 +218,7 @@ namespace AISIGA.Program.IGA
 
         public void RunGeneration()
         {
+            Generation++;
             // Save clas distribution for later 
             Dictionary<int, int> originalClassDistribution = Antibodies
                 .GroupBy(ab => ab.GetClass())
