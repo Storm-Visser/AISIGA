@@ -95,13 +95,26 @@ namespace AISIGA.Program.IGA
                 .Select(fraction => (int)Math.Round(fraction * totalCount))
                 .ToList();
 
+            //Make sure there are no sisues with rounding
+            while (targetCounts.Sum() != totalCount)
+            {
+                if(targetCounts.Sum() < totalCount)
+                {
+                    targetCounts[RandomProvider.GetThreadRandom().Next(0, targetCounts.Count)] += 1;
+                }
+                else
+                {
+                    targetCounts[RandomProvider.GetThreadRandom().Next(0, targetCounts.Count)] -= 1;
+                }
+            }
+
             // Force each class to have at least 10 antibodies
             int extraAdded = 0;
             foreach (int i in targetCounts)
             {
                 if (i < 1)
                 {
-                    targetCounts[i] = 1; // Ensure a minimum of 10 antibodies per class
+                    targetCounts[i] = 1; // Ensure a minimum of 1 antibodies per class
                     extraAdded += 1;
                 }
             }
@@ -187,7 +200,7 @@ namespace AISIGA.Program.IGA
             // Remove the excess antibodies
             if (Config.UseClassRatioLocking)
             {
-                ReplaceByClass(originalClassDistribution);
+                ReplaceByClassWithPartialElitism(originalClassDistribution);
             }
             else
             {
@@ -267,7 +280,7 @@ namespace AISIGA.Program.IGA
             // Remove the excess antibodies
             if (Config.UseClassRatioLocking)
             {
-                ReplaceByClass(originalClassDistribution);
+                ReplaceByClassWithPartialElitism(originalClassDistribution);
             }
             else
             {
@@ -310,6 +323,59 @@ namespace AISIGA.Program.IGA
             }
 
             // Final size safety net (in case of rounding error)
+            balancedPopulation = balancedPopulation
+                .OrderByDescending(ab => ab.GetFitness().GetTotalFitness())
+                .Take(totalTargetSize)
+                .ToList();
+
+            Antibodies = balancedPopulation;
+        }
+
+        public void ReplaceByClassWithPartialElitism(Dictionary<int, int> originalClassDistribution, double eliteFraction = 0.2)
+        {
+            // Get the class groups
+            Dictionary<int, List<Antibody>> classGroups = Antibodies
+                .GroupBy(ab => ab.GetClass())
+                .ToDictionary(g => g.Key, g => g.OrderByDescending(ab => ab.GetFitness().GetTotalFitness()).ToList());
+
+            List<Antibody> balancedPopulation = new List<Antibody>();
+            int totalTargetSize = (int)(this.Antigens.Count * Config.PopulationSizeFractionOfDatapoints);
+            double totalOriginal = originalClassDistribution.Values.Sum();
+            Random rng = new Random();
+
+            foreach (var kvp in classGroups)
+            {
+                int classId = kvp.Key;
+                List<Antibody> sorted = kvp.Value;
+
+                double fraction = originalClassDistribution.ContainsKey(classId)
+                    ? (double)originalClassDistribution[classId] / totalOriginal
+                    : 0;
+
+                int targetSize = (int)Math.Round(fraction * totalTargetSize);
+
+                int eliteCount = (int)Math.Round(targetSize * eliteFraction);
+                int randomCount = targetSize - eliteCount;
+
+                // Add elite individuals
+                var elites = sorted.Take(eliteCount);
+                balancedPopulation.AddRange(elites);
+
+                // Add random individuals from the remainder (if enough exist)
+                var remainder = sorted.Skip(eliteCount).ToList();
+                if (remainder.Count >= randomCount)
+                {
+                    var randoms = remainder.OrderBy(_ => rng.Next()).Take(randomCount);
+                    balancedPopulation.AddRange(randoms);
+                }
+                else
+                {
+                    // If not enough, add all and compensate later
+                    balancedPopulation.AddRange(remainder);
+                }
+            }
+
+            // Final size safety net (in case of rounding or class imbalance)
             balancedPopulation = balancedPopulation
                 .OrderByDescending(ab => ab.GetFitness().GetTotalFitness())
                 .Take(totalTargetSize)
