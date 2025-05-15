@@ -10,7 +10,7 @@ namespace AISIGA.Program.Experiments
     {
         public override bool UseUI => true;
 
-        public override int NumberOfGenerations => 200;
+        public override int NumberOfGenerations => 600;
         public override double PopulationSizeFractionOfDatapoints => 1;
         public override double PercentageOfParents => 0.2;
         public override int DataSetNr => 0;
@@ -36,8 +36,8 @@ namespace AISIGA.Program.Experiments
         public override bool UseUnboundedRegions => false;
         public override bool UseAffinityMaturationMutation => false;
         public override bool UseTournamentSelection => true;
-        public override int TournamentSize => 2;
-        public override bool UseClassRatioLocking => true;
+        public override int TournamentSize => 4;
+        public override bool UseClassRatioLocking => false;
         public override bool UseUnboundedRatioLocking => false;
         public override double RateOfUnboundedRegions => 0.2;
     }

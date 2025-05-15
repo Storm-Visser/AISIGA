@@ -19,7 +19,7 @@ namespace AISIGA.Program.Tests.MethodTests
             LabelEncoder.Encode("c");
             Antibody testAB = new Antibody(0,1,3);
             testAB.AssignRandomFeatureValuesAndMultipliers([2.0, 2.0, 2.0], [-2.0, -2.0, -2.0], config.UseHyperSpheres, config.UseUnboundedRegions, config.RateOfUnboundedRegions);
-            testAB.AssingRandomClassAndRadius(config.BaseRadius, 1);
+            testAB.AssingClassAndRadius(config.BaseRadius, 1);
             List<Antigen> allAntigens = new List<Antigen>();
 
             System.Diagnostics.Debug.WriteLine("TestAB Before: ");

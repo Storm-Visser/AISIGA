@@ -76,11 +76,11 @@ namespace AISIGA.Program.IGA
                 }
             }
 
-            // Add the slight offset according to radius
+            // Add the slight offset of 10%
             for (int i = 0; i < featureCount; i++)
             {
-                maxValues[i] += Config.BaseRadius;
-                minValues[i] += Config.BaseRadius;
+                maxValues[i] *= 1.1;
+                minValues[i] *= 1.1;
             }
 
             
@@ -141,9 +141,26 @@ namespace AISIGA.Program.IGA
                 // Assign and update count
                 currentCounts[selectedClass]++;
 
-                antibody.AssingRandomClassAndRadius(Config.BaseRadius, selectedClass);
-                // Also assign the feature values and multipliers
+
+                // Assign the feature values and multipliers
                 antibody.AssignRandomFeatureValuesAndMultipliers(maxValues, minValues, Config.UseHyperSpheres, Config.UseUnboundedRegions, Config.RateOfUnboundedRegions);
+
+                // Radius based on a random AB
+                // Get all AG of same class
+                List<Antigen> sameClassAntigens = Antigens
+                                    .Where(ag => ag.GetActualClass() == selectedClass)
+                                    .ToList();
+                // Select a random one
+                Antigen selectedAntigen = sameClassAntigens[rnd.Next(0, sameClassAntigens.Count)];
+                // Get the distance to that AG
+                double SqrdDistance = 0.0;
+                for (int i = 0; i < antibody.GetFeatureMultipliers().Length; i++)
+                {
+                    double diff = antibody.GetFeatureValueAt(i) - selectedAntigen.GetFeatureValueAt(i);
+                    SqrdDistance += diff * diff;
+                }
+
+                antibody.AssingClassAndRadius(Math.Sqrt(SqrdDistance), selectedClass);
             }
         }
 

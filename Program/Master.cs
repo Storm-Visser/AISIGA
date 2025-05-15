@@ -16,6 +16,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
 using System.Xml.Serialization;
+using System.Diagnostics;
 
 namespace AISIGA.Program
 {
@@ -44,12 +45,15 @@ namespace AISIGA.Program
 
         public void Initialize()
         {
+            Stopwatch stopwatch = Stopwatch.StartNew();
             InitIslands();
             InitAntigensAndAntibodies();
             DivideAntigenAndAntibodies();
             RandomizeAntibodies();
             CollectResults(false);
             StartExperiment();
+            stopwatch.Stop();
+            System.Diagnostics.Trace.WriteLine($"Elapsed time: {stopwatch.Elapsed.TotalSeconds} seconds");
         }
 
         private void InitIslands()
@@ -189,7 +193,6 @@ namespace AISIGA.Program
 
             //Done Threading
             CollectResults(true);
-
         }
 
         private void UpdateIslandUI(int nr)
@@ -273,6 +276,7 @@ namespace AISIGA.Program
                     resultsWindow.ShowClassificationResults(this.Antigens, this.BestAntibodyNetworkFitness);
                 });
             }
+
         }
 
         private void ShowClassDistribution()
