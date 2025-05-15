@@ -43,8 +43,8 @@ namespace AISIGA.UI
             {
                 new Axis
                 {
-                    MinLimit = minX - 1,  // Padding
-                    MaxLimit = maxX + 1,
+                    MinLimit = minX - 0.1,  // Padding
+                    MaxLimit = maxX + 0.1,
                 }
             };
 
@@ -52,8 +52,8 @@ namespace AISIGA.UI
             {
                 new Axis
                 {
-                    MinLimit = minY - 1,  // Padding
-                    MaxLimit = maxY + 1,
+                    MinLimit = minY - 0.1,  // Padding
+                    MaxLimit = maxY + 0.1,
                 }
             };
 

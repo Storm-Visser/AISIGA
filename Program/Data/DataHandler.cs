@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Shapes;
@@ -54,6 +55,10 @@ namespace AISIGA.Program.Data
                     throw new ArgumentException("Invalid dataset number");
             }
 
+            // 1. Read all entries into raw feature vectors
+            List<double[]> rawFeatureVectors = new List<double[]>();
+            List<string> labels = new List<string>();
+
             var entries = System.IO.File.ReadAllLines(filePath);
 
             foreach (var entry in entries)
@@ -64,28 +69,52 @@ namespace AISIGA.Program.Data
 
                 if (values.Any(p => string.IsNullOrWhiteSpace(p))) continue;
 
-                double[] featureValues;
-
                 try
                 {
-                    featureValues = values
+                    double[] featureValues = values
                         .Where((_, index) => index != labelIndex)
                         .Select(v => double.Parse(v, CultureInfo.InvariantCulture))
                         .ToArray();
+
+                    rawFeatureVectors.Add(featureValues);
+                    labels.Add(values[labelIndex]);
                 }
                 catch (FormatException ex)
                 {
                     Console.WriteLine($"Error parsing entry: {entry}. Exception: {ex.Message}");
                     continue;
                 }
-
-                Antigen newAntigen = new Antigen(-1, LabelEncoder.Encode(values[labelIndex]), featureValues.Length);
-                newAntigen.SetFeatureValues(featureValues);
-                Antigens.Add(newAntigen);
             }
 
+            // 2. Calculate min and max per feature dimension
+            int featureCount = rawFeatureVectors[0].Length;
+            double[] mins = new double[featureCount];
+            double[] maxs = new double[featureCount];
 
-            return (Antigens);
+            for (int i = 0; i < featureCount; i++)
+            {
+                mins[i] = rawFeatureVectors.Min(f => f[i]);
+                maxs[i] = rawFeatureVectors.Max(f => f[i]);
+            }
+
+            // 3. Normalize and create antigens
+            for (int i = 0; i < rawFeatureVectors.Count; i++)
+            {
+                double[] normalized = new double[featureCount];
+                for (int j = 0; j < featureCount; j++)
+                {
+                    double value = rawFeatureVectors[i][j];
+                    if (mins[j] == maxs[j])
+                        normalized[j] = 0.0; // Avoid divide by zero
+                    else
+                        normalized[j] = (value - mins[j]) / (maxs[j] - mins[j]);
+                }
+
+                Antigen newAntigen = new Antigen(-1, LabelEncoder.Encode(labels[i]), featureCount);
+                newAntigen.SetFeatureValues(normalized);
+                Antigens.Add(newAntigen);
+            }
+            return Antigens;
         }
 
         public static List<double> CalcClassDistribution(List<Antigen> antigens)
@@ -108,6 +137,26 @@ namespace AISIGA.Program.Data
             }
 
             return classFractions;
+        }
+
+        public static double[] NormalizeFeatureValues(double[] featureValues)
+        {
+            double min = featureValues.Min();
+            double max = featureValues.Max();
+
+            // Avoid divide-by-zero if all values are the same
+            if (min == max)
+            {
+                return Enumerable.Repeat(0.0, featureValues.Length).ToArray();
+            }
+
+            double[] normalized = new double[featureValues.Length];
+            for (int i = 0; i < featureValues.Length; i++)
+            {
+                normalized[i] = (featureValues[i] - min) / (max - min);
+            }
+
+            return normalized;
         }
     }
 }
