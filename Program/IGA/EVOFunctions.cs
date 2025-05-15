@@ -50,27 +50,27 @@ namespace AISIGA.Program.IGA
                 return AffinityMaturationMutation(antibody, allAntigens);
             }
 
-            //Mutate class
-            if (RandomProvider.GetThreadRandom().NextDouble() < Config.MutationFrequency)
-            {
-                //get a list of possible classes (not the current class) from encoding
-                List<int> possibleClasses = Enumerable.Range(0, LabelEncoder.ClassCount)
-                    .Where(c => c != antibody.GetClass())
-                    .ToList();
-                //randomly select a class from the list
-                antibody.SetClass(possibleClasses[RandomProvider.GetThreadRandom().Next(possibleClasses.Count)]);
-            }
+            ////Mutate class
+            //if (RandomProvider.GetThreadRandom().NextDouble() < Config.MutationFrequency)
+            //{
+            //    //get a list of possible classes (not the current class) from encoding
+            //    List<int> possibleClasses = Enumerable.Range(0, LabelEncoder.ClassCount)
+            //        .Where(c => c != antibody.GetClass())
+            //        .ToList();
+            //    //randomly select a class from the list
+            //    antibody.SetClass(possibleClasses[RandomProvider.GetThreadRandom().Next(possibleClasses.Count)]);
+            //}
 
 
             //Mutate base radius
-            if (RandomProvider.GetThreadRandom().NextDouble() < Config.MutationFrequency)
-            {
+            //if (RandomProvider.GetThreadRandom().NextDouble() < Config.MutationFrequency)
+            //{
                 antibody.SetBaseRadius(antibody.GetBaseRadius() * (RandomProvider.GetThreadRandom().NextDouble() * 1.9) + 0.1);
-            }
+            //}
 
 
-            //Mutate feature values
-            double[] featureValues = antibody.GetFeatureValues();
+        //Mutate feature values
+        double[] featureValues = antibody.GetFeatureValues();
             for (int i = 0; i < featureValues.Length; i++)
             {
                 if (RandomProvider.GetThreadRandom().NextDouble() < Config.MutationFrequency)

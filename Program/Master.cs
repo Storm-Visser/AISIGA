@@ -118,7 +118,7 @@ namespace AISIGA.Program
             List<Antibody> antibodies = new List<Antibody>();
             for (int i = 0; i < (this.TrainAntigens.Count * Config.PopulationSizeFractionOfDatapoints); i++)
             {
-                antibodies.Add(new AIS.Antibody(-1, Config.BaseRadius, this.TrainAntigens[0].GetLength()));
+                antibodies.Add(new AIS.Antibody(-1, -1, this.TrainAntigens[0].GetLength()));
             }
             //Divide the TrainAntigens into the islands Round robin style
             for (int i = 0; i < this.TrainAntigens.Count; i++)
@@ -191,7 +191,6 @@ namespace AISIGA.Program
                     UpdateIslandUI(3);
                     UpdateTotalUI(antibodies, trainAcc, testAcc);
                 }
-                shownUI = true; // Set to true after the first migration
             })
             {
 
@@ -310,7 +309,7 @@ namespace AISIGA.Program
 
 
             //ShowClassDistribution();
-            if (ShowWindow && Config.UseUI)
+            if (ShowWindow && Config.UseUI && !shownUI)
             {
                 Application.Current.Dispatcher.Invoke(() =>
                 {

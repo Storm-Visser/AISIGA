@@ -25,7 +25,6 @@ namespace AISIGA.Program.Experiments
         public abstract double MigrationFrequency { get; }
         public abstract double MasterMigrationFreq { get; }
 
-        public abstract double BaseRadius { get; }
         public abstract double aScoreMultiplier { get; }
         public abstract double bScoreMultiplier { get; }
         public abstract double cScoreMultiplier { get; }

@@ -99,10 +99,10 @@ namespace AISIGA.Program.IGA
             int extraAdded = 0;
             foreach (int i in targetCounts)
             {
-                if (i < 10)
+                if (i < 1)
                 {
-                    targetCounts[i] = 10; // Ensure a minimum of 10 antibodies per class
-                    extraAdded += 10;
+                    targetCounts[i] = 1; // Ensure a minimum of 10 antibodies per class
+                    extraAdded += 1;
                 }
             }
 
