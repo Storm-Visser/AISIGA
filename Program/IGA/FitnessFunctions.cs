@@ -13,7 +13,7 @@ namespace AISIGA.Program.IGA
 {
     static class FitnessFunctions
     {
-        public static ExperimentConfig? Config { get; set; }
+        public static AbstractExperimentConfig? Config { get; set; }
 
         public static double CalculateCorrectness(double TruePositives, double FalsePositives)
         {

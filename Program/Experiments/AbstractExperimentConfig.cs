@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AISIGA.Program.Experiments
 {
-    abstract class ExperimentConfig
+    abstract class AbstractExperimentConfig
     {
         public abstract bool UseUI { get; }
 

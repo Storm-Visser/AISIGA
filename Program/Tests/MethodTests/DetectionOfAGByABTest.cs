@@ -14,7 +14,7 @@ namespace AISIGA.Program.Tests.MethodTests
     {
         public static void TestAGDetection()
         {
-            ExperimentConfig config = new TestConfig();
+            AbstractExperimentConfig config = new TestConfig();
             FitnessFunctions.Config = config;
             TestHypersphere();
             TestHyperellipsoid();

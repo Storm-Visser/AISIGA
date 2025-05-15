@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AISIGA.Program.Experiments
 {
-    class Experiment1_4 : ExperimentConfig
+    class Experiment1_1 : AbstractExperimentConfig
     {
         public override bool UseUI => true;
 

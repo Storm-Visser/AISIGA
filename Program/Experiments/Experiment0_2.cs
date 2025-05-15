@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AISIGA.Program.Experiments
 {
-    class TestConfig : AbstractExperimentConfig
+    class Experiment0_2 : AbstractExperimentConfig
     {
         public override bool UseUI => true;
 
@@ -39,7 +39,6 @@ namespace AISIGA.Program.Experiments
         public override int TournamentSize => 2;
         public override bool UseClassRatioLocking => true;
         public override bool UseUnboundedRatioLocking => false;
-        public override double RateOfUnboundedRegions => 0.2;   
-
+        public override double RateOfUnboundedRegions => 0.2;
     }
 }

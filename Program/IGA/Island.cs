@@ -15,12 +15,12 @@ namespace AISIGA.Program.IGA
 {
     class Island
     {
-        private ExperimentConfig Config { get; set; }
+        private AbstractExperimentConfig Config { get; set; }
         private List<AIS.Antigen> Antigens { get; set; }
         private List<AIS.Antibody> Antibodies { get; set; }
         private Island? Neighbour { get; set; }
 
-        public Island(ExperimentConfig config)
+        public Island(AbstractExperimentConfig config)
         {
             Config = config;
             Antigens = new List<AIS.Antigen>();

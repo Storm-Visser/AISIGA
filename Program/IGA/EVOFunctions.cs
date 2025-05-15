@@ -10,7 +10,7 @@ namespace AISIGA.Program.IGA
 {
     static class EVOFunctions
     {
-        public static ExperimentConfig? Config { get; set; }
+        public static AbstractExperimentConfig? Config { get; set; }
 
         public static Antibody ElitismSelection(List<Antibody> population)
         {

@@ -13,7 +13,7 @@ namespace AISIGA.Program.Tests.MethodTests
     {
         public static void TestMutation() 
         {
-            ExperimentConfig config = new TestConfig();
+            AbstractExperimentConfig config = new TestConfig();
             LabelEncoder.Encode("a");
             LabelEncoder.Encode("b");
             LabelEncoder.Encode("c");

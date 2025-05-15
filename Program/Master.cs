@@ -21,7 +21,7 @@ namespace AISIGA.Program
 {
     class Master
     {
-        private ExperimentConfig Config { get; set; }
+        private AbstractExperimentConfig Config { get; set; }
         private List<Island> Islands { get; set; }
         private List<Antibody> BestAntibodyNetwork { get; set; }
         private double BestAntibodyNetworkFitness { get; set; }
@@ -30,7 +30,7 @@ namespace AISIGA.Program
 
         // UI Variables
 
-        public Master(ExperimentConfig config, DashboardWindow dashboardWindow)
+        public Master(AbstractExperimentConfig config, DashboardWindow dashboardWindow)
         {
             Config = config;
             EVOFunctions.Config = this.Config;
