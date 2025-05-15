@@ -9,6 +9,7 @@ namespace AISIGA.Program.Experiments
     abstract class AbstractExperimentConfig
     {
         public abstract bool UseUI { get; }
+        public abstract int KFoldCount { get; }
 
         public abstract int NumberOfGenerations { get; }
         public abstract double PopulationSizeFractionOfDatapoints { get; }

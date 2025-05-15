@@ -14,7 +14,7 @@ namespace AISIGA.Program.Data
 {
     public static class DataHandler
     {
-        public static (List<Antigen>, List<Antigen>) TranslateDataToAntigens(int DataSetNr)
+        public static List<Antigen> TranslateDataToAntigens(int DataSetNr)
         {
             List<Antigen> Antigens = new List<Antigen>();
 
@@ -116,7 +116,7 @@ namespace AISIGA.Program.Data
                 Antigens.Add(newAntigen);
             }
 
-            return SplitDataSet(Antigens, 0.8);
+            return Antigens;
         }
 
         public static List<double> CalcClassDistribution(List<Antigen> antigens)
@@ -141,32 +141,41 @@ namespace AISIGA.Program.Data
             return classFractions;
         }
 
-        public static (List<Antigen>, List<Antigen>) SplitDataSet(List<Antigen> antigens, double fraction)
+        public static List<(List<Antigen> Train, List<Antigen> Test)> GenerateStratifiedKFolds(List<Antigen> antigens, int k)
         {
-            List<Antigen> trainSet = new List<Antigen>();
-            List<Antigen> testSet = new List<Antigen>();
+            var folds = new List<List<Antigen>>();
+            for (int i = 0; i < k; i++) folds.Add(new List<Antigen>());
 
             var random = new Random();
 
-            // Group by class label
+            // Group antigens by class label
             var groupedByClass = antigens
                 .GroupBy(a => a.GetActualClass())
                 .ToDictionary(g => g.Key, g => g.ToList());
 
+            // Distribute each class's items into folds
             foreach (var kvp in groupedByClass)
             {
-                var classLabel = kvp.Key;
-                var items = kvp.Value;
+                var items = kvp.Value.OrderBy(_ => random.Next()).ToList();
 
-                // Shuffle the list
-                items = items.OrderBy(_ => random.Next()).ToList();
-
-                int trainCount = (int)(items.Count * fraction);
-
-                trainSet.AddRange(items.Take(trainCount));
-                testSet.AddRange(items.Skip(trainCount));
+                for (int i = 0; i < items.Count; i++)
+                {
+                    folds[i % k].Add(items[i]);
+                }
             }
-            return (trainSet, testSet);
+
+            // Build k train/test splits
+            var result = new List<(List<Antigen> Train, List<Antigen> Test)>();
+
+            for (int i = 0; i < k; i++)
+            {
+                var test = folds[i];
+                var train = folds.SelectMany((f, j) => j == i ? Enumerable.Empty<Antigen>() : f).ToList();
+                result.Add((train, test));
+            }
+
+            return result;
         }
+
     }
 }

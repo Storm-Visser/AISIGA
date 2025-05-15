@@ -8,9 +8,10 @@ namespace AISIGA.Program.Experiments
 {
     class TestConfig : AbstractExperimentConfig
     {
-        public override bool UseUI => true;
+        public override bool UseUI => false;
+        public override int KFoldCount => 5;
 
-        public override int NumberOfGenerations => 200;
+        public override int NumberOfGenerations => 20;
         public override double PopulationSizeFractionOfDatapoints => 1;
         public override double PercentageOfParents => 0.2;
         public override int DataSetNr => 0;

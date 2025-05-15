@@ -28,11 +28,10 @@ public partial class MainWindow : Window
         // Example: Show the dashboard
         DashboardWindow dashboard = new DashboardWindow();
         dashboard.Show();
-        // Optional: Hide main window
         this.Hide();
 
         // Initialize the experiment configuration & the controller
-        AbstractExperimentConfig expConfig = new Experiment0_2();
+        AbstractExperimentConfig expConfig = new TestConfig();
         Master master = new Master(expConfig, dashboard);
         Task.Run(() =>
         {

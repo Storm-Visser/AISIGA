@@ -46,16 +46,37 @@ namespace AISIGA.Program
 
         public void Initialize()
         {
-            Stopwatch stopwatch = Stopwatch.StartNew();
-            InitIslands();
-            InitAntigensAndAntibodies();
-            DivideAntigenAndAntibodies();
-            RandomizeAntibodies();
-            CollectResults(false);
-            StartExperiment();
-            stopwatch.Stop();
-            System.Diagnostics.Trace.WriteLine($"Elapsed time: {stopwatch.Elapsed.TotalSeconds} seconds");
+
+            List<Antigen> allAntigens = Data.DataHandler.TranslateDataToAntigens(Config.DataSetNr);
+
+            for (int run = 0; run < 20; run++)
+            {
+                List<(List<Antigen> Train, List<Antigen> Test)> folds = Data.DataHandler.GenerateStratifiedKFolds(allAntigens, Config.KFoldCount);
+
+                for (int i = 0; i < folds.Count; i++)
+                {
+                    Stopwatch stopwatch = Stopwatch.StartNew();
+                    InitIslands();
+                    this.TrainAntigens = folds[i].Train;
+                    this.TestAntigens = folds[i].Test;
+                    DivideAntigenAndAntibodies();
+                    RandomizeAntibodies();
+                    StartExperiment();
+                    stopwatch.Stop();
+                    System.Diagnostics.Trace.WriteLine($"Run {run + 1}, Fold {i + 1}: Elapsed time: {stopwatch.Elapsed.TotalSeconds} seconds");
+                    this.Reset();
+                    if (Config.UseUI)
+                    {
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            this.DashboardWindow = new DashboardWindow();
+                            this.DashboardWindow.Show();
+                        });
+                    }
+                }
+            }
         }
+
 
         private void InitIslands()
         {
@@ -76,13 +97,6 @@ namespace AISIGA.Program
                 }
             }
             Islands[0].SetNeighbour(Islands[Islands.Count - 1]);
-        }
-
-        private void InitAntigensAndAntibodies()
-        {
-            //Create the TrainAntigens and Antibodies
-            (this.TrainAntigens, this.TestAntigens) = Data.DataHandler.TranslateDataToAntigens(Config.DataSetNr);
-            this.TrainAntigens = this.TrainAntigens.OrderBy(x => RandomProvider.GetThreadRandom().Next()).ToList();
         }
 
         private void DivideAntigenAndAntibodies()
@@ -121,7 +135,6 @@ namespace AISIGA.Program
 
             Barrier barrier = new Barrier(islandCount, (b) =>
             {
-                System.Diagnostics.Trace.WriteLine("All islands have reached the barrier. Starting migration...");
                 // This code runs ONCE after all threads hit the barrier
                 foreach (var island in Islands)
                 {
@@ -143,7 +156,6 @@ namespace AISIGA.Program
                         }
                         BestAntibodyNetwork = CopiedBestAntibodies;
                         BestAntibodyNetworkFitness = newFitness;
-                        System.Diagnostics.Trace.WriteLine("New best network found, starting migration to master");
                     }
                     MigCount = 0;
                 }
@@ -270,8 +282,8 @@ namespace AISIGA.Program
 
             System.Diagnostics.Trace.WriteLine(trainFitness);
             System.Diagnostics.Trace.WriteLine(trainUnassigned);
-            ShowClassDistribution();
-            if (ShowWindow)
+            //ShowClassDistribution();
+            if (ShowWindow && Config.UseUI)
             {
                 Application.Current.Dispatcher.Invoke(() =>
                 {
@@ -297,6 +309,15 @@ namespace AISIGA.Program
                 //System.Diagnostics.Trace.WriteLine($"Class {i}: {totalOfClass}");
                 System.Diagnostics.Trace.WriteLine($"Class {i}: {totalOfClass / (this.Islands[0].GetAntibodies().Count * 4)}");
             }
+        }
+
+        private void Reset()
+        {
+            this.Islands.Clear(); // Clear the islands for the next fold
+            this.BestAntibodyNetwork.Clear();
+            this.BestAntibodyNetworkFitness = -1;
+            this.TrainAntigens.Clear();
+            this.TestAntigens.Clear();
         }
     }
 }

@@ -9,6 +9,7 @@ namespace AISIGA.Program.Experiments
     class Experiment0_2 : AbstractExperimentConfig
     {
         public override bool UseUI => true;
+        public override int KFoldCount => 5;
 
         public override int NumberOfGenerations => 1000;
         public override double PopulationSizeFractionOfDatapoints => 1;
