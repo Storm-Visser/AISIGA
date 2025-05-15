@@ -26,7 +26,8 @@ namespace AISIGA.Program
         private List<Island> Islands { get; set; }
         private List<Antibody> BestAntibodyNetwork { get; set; }
         private double BestAntibodyNetworkFitness { get; set; }
-        private List<AIS.Antigen> Antigens { get; set; }
+        private List<AIS.Antigen> TrainAntigens { get; set; }
+        private List<AIS.Antigen> TestAntigens { get; set; }
         private DashboardWindow DashboardWindow { get; set; } // UI
 
         // UI Variables
@@ -39,7 +40,7 @@ namespace AISIGA.Program
             this.BestAntibodyNetwork = new List<Antibody>();
             this.BestAntibodyNetworkFitness = -1;
             Islands = new List<Island>();
-            Antigens = new List<AIS.Antigen>();
+            TrainAntigens = new List<AIS.Antigen>();
             DashboardWindow = dashboardWindow;
         }
 
@@ -79,23 +80,23 @@ namespace AISIGA.Program
 
         private void InitAntigensAndAntibodies()
         {
-            //Create the Antigens and Antibodies
-            this.Antigens = Data.DataHandler.TranslateDataToAntigens(Config.DataSetNr);
-            this.Antigens = this.Antigens.OrderBy(x => RandomProvider.GetThreadRandom().Next()).ToList();
+            //Create the TrainAntigens and Antibodies
+            (this.TrainAntigens, this.TestAntigens) = Data.DataHandler.TranslateDataToAntigens(Config.DataSetNr);
+            this.TrainAntigens = this.TrainAntigens.OrderBy(x => RandomProvider.GetThreadRandom().Next()).ToList();
         }
 
         private void DivideAntigenAndAntibodies()
         {
             List<Antibody> antibodies = new List<Antibody>();
-            for (int i = 0; i < (this.Antigens.Count * Config.PopulationSizeFractionOfDatapoints); i++)
+            for (int i = 0; i < (this.TrainAntigens.Count * Config.PopulationSizeFractionOfDatapoints); i++)
             {
-                antibodies.Add(new AIS.Antibody(-1, Config.BaseRadius, this.Antigens[0].GetLength()));
+                antibodies.Add(new AIS.Antibody(-1, Config.BaseRadius, this.TrainAntigens[0].GetLength()));
             }
-            //Divide the Antigens into the islands Round robin style
-            for (int i = 0; i < this.Antigens.Count; i++)
+            //Divide the TrainAntigens into the islands Round robin style
+            for (int i = 0; i < this.TrainAntigens.Count; i++)
             {
                 int islandIndex = i % 4;
-                this.Islands[islandIndex].AddAntigen(this.Antigens[i]);
+                this.Islands[islandIndex].AddAntigen(this.TrainAntigens[i]);
                 //add the antibodies aswell while we are at it
                 if (i < antibodies.Count)
                 {
@@ -106,7 +107,7 @@ namespace AISIGA.Program
 
         private void RandomizeAntibodies()
         {
-            List<double> classDistributionFractions = Data.DataHandler.CalcClassDistribution(this.Antigens);
+            List<double> classDistributionFractions = Data.DataHandler.CalcClassDistribution(this.TrainAntigens);
             foreach (var island in Islands)
             {
                 island.InitializeAntibodies(classDistributionFractions);
@@ -130,8 +131,8 @@ namespace AISIGA.Program
                 if (MigCount >= Config.MasterMigrationFreq)
                 {
                     List<Antibody> allAntibodies = GatherAntibodies();
-                    VALIS.AssingAGClassByVoting(allAntibodies, this.Antigens);
-                    (double newFitness, _) = FitnessFunctions.CalculateTotalFitness(this.Antigens);
+                    VALIS.AssingAGClassByVoting(allAntibodies, this.TestAntigens);
+                    (double newFitness, _) = FitnessFunctions.CalculateTotalFitness(this.TestAntigens);
                     if (newFitness > BestAntibodyNetworkFitness)
                     {
                         List<Antibody> CopiedBestAntibodies = new List<Antibody>();
@@ -237,7 +238,7 @@ namespace AISIGA.Program
         private double[] CalculateUIMetrics(List<Antibody> antibodies, bool main)
         {
             double[] metrics = new double[6];
-            if (main) { metrics = new double[7]; }
+            if (main) { metrics = new double[8]; }
             metrics[0] = antibodies.Average(a => a.GetFitness().GetTotalFitness()) *10;
             metrics[1] = antibodies.Average(a => a.GetFitness().GetCorrectness()) * 10;
             metrics[2] = antibodies.Average(a => a.GetFitness().GetCoverage()) * 10;
@@ -246,8 +247,10 @@ namespace AISIGA.Program
             metrics[5] = antibodies.Average(a => a.GetFitness().GetInvalidAvidity()) * 10;
             if (main)
             {
-                VALIS.AssingAGClassByVoting(this.GatherAntibodies(), this.Antigens);
-                (metrics[6], _) = FitnessFunctions.CalculateTotalFitness(this.Antigens);
+                VALIS.AssingAGClassByVoting(this.GatherAntibodies(), this.TrainAntigens);
+                (metrics[6], _) = FitnessFunctions.CalculateTotalFitness(this.TrainAntigens);
+                VALIS.AssingAGClassByVoting(this.GatherAntibodies(), this.TestAntigens);
+                (metrics[7], _) = FitnessFunctions.CalculateTotalFitness(this.TestAntigens);
             }
 
             return metrics;
@@ -260,10 +263,10 @@ namespace AISIGA.Program
 
         private void CollectResults(bool ShowWindow)
         {
-            VALIS.AssingAGClassByVoting(this.BestAntibodyNetwork, this.Antigens);
+            VALIS.AssingAGClassByVoting(this.BestAntibodyNetwork, this.TrainAntigens);
 
             // Calculate the fitness of the antibodies
-            (double trainFitness, double trainUnassigned) = FitnessFunctions.CalculateTotalFitness(this.Antigens);
+            (double trainFitness, double trainUnassigned) = FitnessFunctions.CalculateTotalFitness(this.TrainAntigens);
 
             System.Diagnostics.Trace.WriteLine(trainFitness);
             System.Diagnostics.Trace.WriteLine(trainUnassigned);
@@ -273,7 +276,7 @@ namespace AISIGA.Program
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     ResultsWindow resultsWindow = new ResultsWindow();
-                    resultsWindow.ShowClassificationResults(this.Antigens, this.BestAntibodyNetworkFitness);
+                    resultsWindow.ShowClassificationResults(this.TrainAntigens, this.BestAntibodyNetworkFitness);
                 });
             }
 

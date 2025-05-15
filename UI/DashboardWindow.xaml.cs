@@ -46,9 +46,9 @@ namespace AISIGA.UI
 
         private readonly (string Name, Color Color)[] MetricDefs = new[]
         {
-            ("Total Fitness", Colors.Red),
+            ("Total Fitness", Colors.Blue),
             ("Correctness", Colors.Orange),
-            ("Coverage", Colors.Blue),
+            ("Coverage", Colors.Purple),
             ("Uniqueness", Colors.Brown),
             ("Valid Avidity", Colors.Yellow),
             ("Invalid Avidity", Colors.Orange)
@@ -78,12 +78,23 @@ namespace AISIGA.UI
                 seriesCollection.Add(new LineSeries<double>
                 {
                     Values = new ObservableCollection<double> { 0 },
-                    Name = "Actual Accuracy %",
+                    Name = "Train Accuracy %",
                     Stroke = new SolidColorPaint(new SKColor(0, 255, 0)),
                     
                     GeometryFill = new SolidColorPaint(new SKColor(0, 255, 0)),
                     GeometrySize = 10,
                     GeometryStroke = new SolidColorPaint(new SKColor(0, 255, 0)),
+                    Fill = null
+                });
+                seriesCollection.Add(new LineSeries<double>
+                {
+                    Values = new ObservableCollection<double> { 0 },
+                    Name = "Test Accuracy %",
+                    Stroke = new SolidColorPaint(new SKColor(255, 0, 0)),
+
+                    GeometryFill = new SolidColorPaint(new SKColor(255, 0, 0)),
+                    GeometrySize = 10,
+                    GeometryStroke = new SolidColorPaint(new SKColor(255, 0, 0)),
                     Fill = null
                 });
             }

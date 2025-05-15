@@ -10,7 +10,7 @@ namespace AISIGA.Program.Experiments
     {
         public override bool UseUI => true;
 
-        public override int NumberOfGenerations => 200;
+        public override int NumberOfGenerations => 1000;
         public override double PopulationSizeFractionOfDatapoints => 1;
         public override double PercentageOfParents => 0.2;
         public override int DataSetNr => 0;
@@ -25,7 +25,7 @@ namespace AISIGA.Program.Experiments
         public override double MasterMigrationFreq => 1;
 
         public override double BaseRadius => 0.2;
-        public override double aScoreMultiplier => 2.0;
+        public override double aScoreMultiplier => 2.5;
         public override double bScoreMultiplier => 1.0;
         public override double cScoreMultiplier => 1.2;
         public override double dScoreMultiplier => 0.2;

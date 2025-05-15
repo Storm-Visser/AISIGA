@@ -32,7 +32,7 @@ public partial class MainWindow : Window
         this.Hide();
 
         // Initialize the experiment configuration & the controller
-        AbstractExperimentConfig expConfig = new Experiment1_1();
+        AbstractExperimentConfig expConfig = new Experiment0_2();
         Master master = new Master(expConfig, dashboard);
         Task.Run(() =>
         {

@@ -1,4 +1,5 @@
 ﻿using AISIGA.Program.AIS;
+using AISIGA.Program.Tests;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -13,7 +14,7 @@ namespace AISIGA.Program.Data
 {
     public static class DataHandler
     {
-        public static List<Antigen> TranslateDataToAntigens(int DataSetNr)
+        public static (List<Antigen>, List<Antigen>) TranslateDataToAntigens(int DataSetNr)
         {
             List<Antigen> Antigens = new List<Antigen>();
 
@@ -114,7 +115,8 @@ namespace AISIGA.Program.Data
                 newAntigen.SetFeatureValues(normalized);
                 Antigens.Add(newAntigen);
             }
-            return Antigens;
+
+            return SplitDataSet(Antigens, 0.8);
         }
 
         public static List<double> CalcClassDistribution(List<Antigen> antigens)
@@ -139,24 +141,32 @@ namespace AISIGA.Program.Data
             return classFractions;
         }
 
-        public static double[] NormalizeFeatureValues(double[] featureValues)
+        public static (List<Antigen>, List<Antigen>) SplitDataSet(List<Antigen> antigens, double fraction)
         {
-            double min = featureValues.Min();
-            double max = featureValues.Max();
+            List<Antigen> trainSet = new List<Antigen>();
+            List<Antigen> testSet = new List<Antigen>();
 
-            // Avoid divide-by-zero if all values are the same
-            if (min == max)
+            var random = new Random();
+
+            // Group by class label
+            var groupedByClass = antigens
+                .GroupBy(a => a.GetActualClass())
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            foreach (var kvp in groupedByClass)
             {
-                return Enumerable.Repeat(0.0, featureValues.Length).ToArray();
-            }
+                var classLabel = kvp.Key;
+                var items = kvp.Value;
 
-            double[] normalized = new double[featureValues.Length];
-            for (int i = 0; i < featureValues.Length; i++)
-            {
-                normalized[i] = (featureValues[i] - min) / (max - min);
-            }
+                // Shuffle the list
+                items = items.OrderBy(_ => random.Next()).ToList();
 
-            return normalized;
+                int trainCount = (int)(items.Count * fraction);
+
+                trainSet.AddRange(items.Take(trainCount));
+                testSet.AddRange(items.Skip(trainCount));
+            }
+            return (trainSet, testSet);
         }
     }
 }
