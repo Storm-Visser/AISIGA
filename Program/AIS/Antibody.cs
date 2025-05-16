@@ -101,7 +101,7 @@ namespace AISIGA.Program.AIS
         }
 
 
-        public void AssignRandomFeatureValuesAndMultipliers(double[] MaxFeatureValues, double[] MinFeatureValues, bool useHyperSpheres, bool useUnbounded, double UnboundedChance)
+        public void AssignRandomFeatureValuesAndMultipliers(List<double[]> ClassMaxFeatureValues, List<double[]> ClassMinFeatureValues, bool useHyperSpheres, bool useUnbounded, double UnboundedChance)
         {
             //cance of an ab to be unbounded, prevent everything from being unbounded
             if (RandomProvider.GetThreadRandom().NextDouble() < UnboundedChance)
@@ -110,6 +110,8 @@ namespace AISIGA.Program.AIS
             }
             for (int i = 0; i < FeatureValues.Length; i++)
             {
+                double[] MaxFeatureValues = ClassMaxFeatureValues[Class];
+                double[] MinFeatureValues = ClassMinFeatureValues[Class];
                 FeatureValues[i] = RandomProvider.GetThreadRandom().NextDouble() * (MaxFeatureValues[i] - MinFeatureValues[i]) + MinFeatureValues[i];
                 if (useHyperSpheres)
                 {
@@ -131,6 +133,14 @@ namespace AISIGA.Program.AIS
             }
         }
 
+        public void AssingClass(int selectedClass)
+        {
+            this.Class = selectedClass;
+        }
+        public void AssingRadius(double baseRadius)
+        {
+            this.BaseRadius = baseRadius * RandomProvider.GetThreadRandom().NextDouble() * 1.9 + 0.1;
+        }
         public void AssingClassAndRadius(double baseRadius, int selectedClass)
         {
             this.Class = selectedClass;

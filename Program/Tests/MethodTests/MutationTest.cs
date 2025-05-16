@@ -11,14 +11,26 @@ namespace AISIGA.Program.Tests.MethodTests
 {
     static class MutationTest
     {
-        public static void TestMutation() 
+        public static void TestMutation()
         {
             AbstractExperimentConfig config = new TestConfig();
             LabelEncoder.Encode("a");
             LabelEncoder.Encode("b");
             LabelEncoder.Encode("c");
-            Antibody testAB = new Antibody(0,1,3);
-            testAB.AssignRandomFeatureValuesAndMultipliers([2.0, 2.0, 2.0], [-2.0, -2.0, -2.0], config.UseHyperSpheres, config.UseUnboundedRegions, config.RateOfUnboundedRegions);
+            Antibody testAB = new Antibody(0, 1, 3);
+
+            // Fix: Correctly pass lists of double arrays instead of single double arrays
+            List<double[]> classMaxFeatureValues = new List<double[]> { new double[] { 2.0, 2.0, 2.0 } };
+            List<double[]> classMinFeatureValues = new List<double[]> { new double[] { -2.0, -2.0, -2.0 } };
+
+            testAB.AssignRandomFeatureValuesAndMultipliers(
+                classMaxFeatureValues,
+                classMinFeatureValues,
+                config.UseHyperSpheres,
+                config.UseUnboundedRegions,
+                config.RateOfUnboundedRegions
+            );
+
             testAB.AssingClassAndRadius(1, 1);
             List<Antigen> allAntigens = new List<Antigen>();
 

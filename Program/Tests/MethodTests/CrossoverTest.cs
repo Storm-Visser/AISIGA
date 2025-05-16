@@ -20,9 +20,22 @@ namespace AISIGA.Program.Tests.MethodTests
             Antibody testABP1 = new Antibody(1, 1, 3);
             Antibody testABP2 = new Antibody(2, 2, 3);
 
+            // Fix: Replace incorrect array initialization syntax with proper List<double[]> initialization
+            testABP1.AssignRandomFeatureValuesAndMultipliers(
+                new List<double[]> { new double[] { 1.9, 1.9, 1.9 } },
+                new List<double[]> { new double[] { 1.0, 1.0, 1.0 } },
+                config.UseHyperSpheres,
+                config.UseUnboundedRegions,
+                config.RateOfUnboundedRegions
+            );
 
-            testABP1.AssignRandomFeatureValuesAndMultipliers([1.9, 1.9, 1.9], [1.0, 1.0, 1.0], config.UseHyperSpheres, config.UseUnboundedRegions, config.RateOfUnboundedRegions);
-            testABP2.AssignRandomFeatureValuesAndMultipliers([2.9, 2.9, 2.9], [2.0, 2.0, 2.0], config.UseHyperSpheres, config.UseUnboundedRegions, config.RateOfUnboundedRegions);
+            testABP2.AssignRandomFeatureValuesAndMultipliers(
+                new List<double[]> { new double[] { 2.9, 2.9, 2.9 } },
+                new List<double[]> { new double[] { 2.0, 2.0, 2.0 } },
+                config.UseHyperSpheres,
+                config.UseUnboundedRegions,
+                config.RateOfUnboundedRegions
+            );
 
             System.Diagnostics.Debug.WriteLine("TestAB parents: ");
             System.Diagnostics.Debug.WriteLine($"1; Class: {testABP1.GetClass()}, BaseR: {testABP1.GetBaseRadius()}, " +
@@ -34,7 +47,6 @@ namespace AISIGA.Program.Tests.MethodTests
 
             EVOFunctions.Config = config;
             (Antibody testABC1, Antibody testABC2) = EVOFunctions.CrossoverAntibodies(testABP1, testABP2);
-
 
             System.Diagnostics.Debug.WriteLine("TestAB children: ");
             System.Diagnostics.Debug.WriteLine($"1; Class: {testABC1.GetClass()}, BaseR: {testABC1.GetBaseRadius()}, " +

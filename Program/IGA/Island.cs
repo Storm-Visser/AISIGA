@@ -51,135 +51,6 @@ namespace AISIGA.Program.IGA
             this.Antibodies.Add(antibody);
         }
 
-        public void InitializeAntibodies(List<double> classDistributionFractions)
-        {
-            int featureCount = Antigens[0].GetLength();
-
-            // Find the min and max values of the AntiGens
-            double[] maxValues = new double[featureCount];
-            double[] minValues = new double[featureCount];
-
-            // Initialize with the first antibody
-            for (int i = 0; i < featureCount; i++)
-            {
-                maxValues[i] = Antigens[0].GetFeatureValueAt(i);
-                minValues[i] = Antigens[0].GetFeatureValueAt(i);
-            }
-
-            // Iterate through the rest
-            foreach (var antigen in Antigens.Skip(1))
-            {
-                for (int i = 0; i < featureCount; i++)
-                {
-                    if (antigen.GetFeatureValueAt(i) > maxValues[i])
-                        maxValues[i] = antigen.GetFeatureValueAt(i);
-
-                    if (antigen.GetFeatureValueAt(i) < minValues[i])
-                        minValues[i] = antigen.GetFeatureValueAt(i);
-                }
-            }
-
-            // Add the slight offset of 10%
-            for (int i = 0; i < featureCount; i++)
-            {
-                maxValues[i] *= 1.1;
-                minValues[i] *= 1.1;
-            }
-
-            
-            // Set AB class based on AG class distribution
-            int totalCount = Antibodies.Count;
-
-            // Calculate target distribution count for each class
-            List<int> targetCounts = classDistributionFractions
-                .Select(fraction => (int)Math.Round(fraction * totalCount))
-                .ToList();
-
-            //Make sure there are no sisues with rounding
-            while (targetCounts.Sum() != totalCount)
-            {
-                if(targetCounts.Sum() < totalCount)
-                {
-                    targetCounts[RandomProvider.GetThreadRandom().Next(0, targetCounts.Count)] += 1;
-                }
-                else
-                {
-                    targetCounts[RandomProvider.GetThreadRandom().Next(0, targetCounts.Count)] -= 1;
-                }
-            }
-
-            // Force each class to have at least 10 antibodies
-            int extraAdded = 0;
-            foreach (int i in targetCounts)
-            {
-                if (i < 1)
-                {
-                    targetCounts[i] = 1; // Ensure a minimum of 1 antibodies per class
-                    extraAdded += 1;
-                }
-            }
-
-                //Take extra added from the class with the most antibodies
-                if (extraAdded > 0)
-            {
-                int maxIndex = targetCounts
-                    .Select((val, idx) => new { val, idx })
-                    .Where(x => targetCounts[x.idx] > 1)
-                    .OrderByDescending(x => x.val)
-                    .First().idx;
-
-                targetCounts[maxIndex] -= extraAdded;
-            }
-
-            // Start assigning the classes
-            List<int> currentCounts = new List<int>(new int[targetCounts.Count]);
-
-            var rnd = RandomProvider.GetThreadRandom();
-            foreach (Antibody antibody in Antibodies)
-            {
-                List<int> availableClasses = new List<int>();
-
-                // Only pick from classes that haven't reached their target
-                for (int i = 0; i < targetCounts.Count; i++)
-                {
-                    if (currentCounts[i] < targetCounts[i])
-                        availableClasses.Add(i);
-                }
-
-                // Select one of the remaining classes randomly
-                int selectedClass = availableClasses[rnd.Next(availableClasses.Count)];
-
-                if (!Config.UseClassRatioLocking)
-                {
-                    selectedClass = rnd.Next(0, LabelEncoder.ClassCount);
-                }
-
-                // Assign and update count
-                currentCounts[selectedClass]++;
-
-
-                // Assign the feature values and multipliers
-                antibody.AssignRandomFeatureValuesAndMultipliers(maxValues, minValues, Config.UseHyperSpheres, Config.UseUnboundedRegions, Config.RateOfUnboundedRegions);
-
-                // Radius based on a random AB
-                // Get all AG of same class
-                List<Antigen> sameClassAntigens = Antigens
-                                    .Where(ag => ag.GetActualClass() == selectedClass)
-                                    .ToList();
-                // Select a random one
-                Antigen selectedAntigen = sameClassAntigens[rnd.Next(0, sameClassAntigens.Count)];
-                // Get the distance to that AG
-                double SqrdDistance = 0.0;
-                for (int i = 0; i < antibody.GetFeatureMultipliers().Length; i++)
-                {
-                    double diff = antibody.GetFeatureValueAt(i) - selectedAntigen.GetFeatureValueAt(i);
-                    SqrdDistance += diff * diff;
-                }
-
-                antibody.AssingClassAndRadius(Math.Sqrt(SqrdDistance), selectedClass);
-            }
-        }
-
         private void SortByFitness()
         {
             VALIS.AssingAGClassByVoting(Antibodies, Antigens);
@@ -204,7 +75,7 @@ namespace AISIGA.Program.IGA
             }
             else
             {
-                ReplaceByFitness();
+                ReplaceByPartialFitness();
             }
         }
 
@@ -284,7 +155,7 @@ namespace AISIGA.Program.IGA
             }
             else
             {
-                ReplaceByFitness();
+                ReplaceByPartialFitness();
             }
         }
 
@@ -382,6 +253,33 @@ namespace AISIGA.Program.IGA
                 .ToList();
 
             Antibodies = balancedPopulation;
+        }
+
+
+        public void ReplaceByPartialFitness(double eliteFraction = 0.2)
+        {
+            // Total target size
+            int totalTargetSize = (int)(this.Antigens.Count * Config.PopulationSizeFractionOfDatapoints);
+
+            // Fraction of population to retain as elites
+            double elitismFraction = eliteFraction;
+            int eliteCount = (int)Math.Round(elitismFraction * totalTargetSize);
+            int randomCount = totalTargetSize - eliteCount;
+
+            // Sort by fitness
+            var sorted = Antibodies.OrderByDescending(ab => ab.GetFitness().GetTotalFitness()).ToList();
+
+            // Take top N elites
+            List<Antibody> selected = new List<Antibody>(sorted.Take(eliteCount));
+
+            // Randomly sample the remaining from the rest (excluding the elites)
+            Random rng = new Random();
+            var nonElites = sorted.Skip(eliteCount).OrderBy(_ => rng.Next()).Take(randomCount);
+
+            selected.AddRange(nonElites);
+
+            // Final replacement
+            Antibodies = selected;
         }
 
         public void ReplaceByFitness()
