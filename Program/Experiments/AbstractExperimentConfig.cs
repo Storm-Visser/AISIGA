@@ -35,6 +35,7 @@ namespace AISIGA.Program.Experiments
         public abstract bool UseHyperEllipsoids { get; }
         public abstract bool UseUnboundedRegions{ get; }
         public abstract bool UseAffinityMaturationMutation { get; }
+        public abstract double ElitismPercentage { get; }
         public abstract bool UseTournamentSelection { get; }
         public abstract int TournamentSize { get; }
         public abstract bool UseClassRatioLocking { get; }

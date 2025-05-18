@@ -35,8 +35,9 @@ namespace AISIGA.Program.Experiments
         public override bool UseHyperEllipsoids => false;
         public override bool UseUnboundedRegions => false;
         public override bool UseAffinityMaturationMutation => false;
+        public override double ElitismPercentage => 0.2;
         public override bool UseTournamentSelection => true;
-        public override int TournamentSize => 2;
+        public override int TournamentSize => 3;
         public override bool UseClassRatioLocking => true;
         public override bool UseUnboundedRatioLocking => false;
         public override double RateOfUnboundedRegions => 0.2;
