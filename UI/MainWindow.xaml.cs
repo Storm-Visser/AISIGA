@@ -29,7 +29,7 @@ public partial class MainWindow : Window
         this.Hide();
 
         // Initialize the experiment configuration & the controller
-        AbstractExperimentConfig expConfig = new TestConfig();
+        AbstractExperimentConfig expConfig = new Experiment1_1();
         // Example: Show the dashboard
         DashboardWindow dashboard = new DashboardWindow();
         if (expConfig.UseUI)

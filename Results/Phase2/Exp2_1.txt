@@ -1,1 +1,11 @@
-﻿
+﻿Wine:
+
+Diabetes:
+
+Ionosphere:
+
+Sonar:
+
+Iris:
+
+Glass:

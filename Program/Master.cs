@@ -54,7 +54,7 @@ namespace AISIGA.Program
         {
             List<Antigen> allAntigens = Data.DataHandler.TranslateDataToAntigens(Config.DataSetNr);
             List<Result> results = new List<Result>();
-            for (int run = 0; run < 10; run++)
+            for (int run = 0; run < 20; run++)
             {
                 List<(List<Antigen> Train, List<Antigen> Test)> folds = Data.DataHandler.GenerateStratifiedKFolds(allAntigens, Config.KFoldCount);
 

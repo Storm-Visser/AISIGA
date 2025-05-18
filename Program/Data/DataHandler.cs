@@ -38,7 +38,7 @@ namespace AISIGA.Program.Data
                     break;
                 case 3:
                     filePath = "Program/Data/Datasets/ionosphere.data";
-                    labelIndex = 0;
+                    labelIndex = 34;
                     break;
                 case 4:
                     filePath = "Program/Data/Datasets/sonar.txt";

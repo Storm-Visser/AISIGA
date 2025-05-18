@@ -71,11 +71,11 @@ namespace AISIGA.Program.IGA
             // Remove the excess antibodies
             if (Config.UseClassRatioLocking)
             {
-                ReplaceByClassWithPartialElitism(originalClassDistribution);
+                ReplaceByClassWithPartialElitism(originalClassDistribution, 0.2);
             }
             else
             {
-                ReplaceByPartialFitness();
+                ReplaceByPartialFitness(0.2);
             }
         }
 
@@ -202,7 +202,7 @@ namespace AISIGA.Program.IGA
             Antibodies = balancedPopulation;
         }
 
-        public void ReplaceByClassWithPartialElitism(Dictionary<int, int> originalClassDistribution, double eliteFraction = 0.2)
+        public void ReplaceByClassWithPartialElitism(Dictionary<int, int> originalClassDistribution, double eliteFraction)
         {
             // Get the class groups
             Dictionary<int, List<Antibody>> classGroups = Antibodies
@@ -256,7 +256,7 @@ namespace AISIGA.Program.IGA
         }
 
 
-        public void ReplaceByPartialFitness(double eliteFraction = 0.2)
+        public void ReplaceByPartialFitness(double eliteFraction)
         {
             // Total target size
             int totalTargetSize = (int)(this.Antigens.Count * Config.PopulationSizeFractionOfDatapoints);
