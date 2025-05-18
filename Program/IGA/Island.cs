@@ -151,11 +151,11 @@ namespace AISIGA.Program.IGA
             // Remove the excess antibodies
             if (Config.UseClassRatioLocking)
             {
-                ReplaceByClassWithPartialElitism(originalClassDistribution);
+                ReplaceByClassWithPartialElitism(originalClassDistribution, Config.ElitismPercentage);
             }
             else
             {
-                ReplaceByPartialFitness();
+                ReplaceByPartialFitness(Config.ElitismPercentage);
             }
         }
 
