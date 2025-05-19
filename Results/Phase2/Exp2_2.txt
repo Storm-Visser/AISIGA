@@ -1,11 +1,59 @@
 ﻿Wine:
+Fold 0: Test Acc = 95,54 ± 3,45, Train Acc = 93,26 ± 2,69, Time = 0,63s ± 0,19s
+Fold 1: Test Acc = 93,19 ± 4,69, Train Acc = 92,43 ± 3,63, Time = 0,59s ± 0,03s
+Fold 2: Test Acc = 95,69 ± 2,84, Train Acc = 92,99 ± 3,51, Time = 0,59s ± 0,04s
+Fold 3: Test Acc = 93,57 ± 3,71, Train Acc = 92,34 ± 4,14, Time = 0,60s ± 0,02s
+Fold 4: Test Acc = 95,59 ± 3,66, Train Acc = 92,60 ± 3,69, Time = 0,60s ± 0,03s
+Overall Test Accuracy: 94,72 ± 3,88
+Overall Train Accuracy: 92,73 ± 3,58
+Overall Time: 0,60 seconds ± 0,09 seconds
 
 Diabetes:
+Fold 0: Test Acc = 64,94 ± 0,00, Train Acc = 65,15 ± 0,00, Time = 15,67s ± 1,35s
+Fold 1: Test Acc = 64,94 ± 0,00, Train Acc = 65,15 ± 0,00, Time = 15,58s ± 0,47s
+Fold 2: Test Acc = 64,94 ± 0,00, Train Acc = 65,15 ± 0,00, Time = 15,60s ± 0,69s
+Fold 3: Test Acc = 65,36 ± 0,00, Train Acc = 65,04 ± 0,00, Time = 15,42s ± 0,53s
+Fold 4: Test Acc = 65,36 ± 0,00, Train Acc = 65,04 ± 0,00, Time = 15,54s ± 0,53s
+Overall Test Accuracy: 65,10 ± 0,21
+Overall Train Accuracy: 65,10 ± 0,05
+Overall Time: 15,56 seconds ± 0,79 seconds
 
 Ionosphere:
+Fold 0: Test Acc = 67,61 ± 4,11, Train Acc = 68,61 ± 5,02, Time = 7,93s ± 1,07s
+Fold 1: Test Acc = 67,79 ± 4,18, Train Acc = 67,22 ± 3,55, Time = 7,71s ± 0,29s
+Fold 2: Test Acc = 67,71 ± 3,82, Train Acc = 66,92 ± 3,77, Time = 7,54s ± 0,35s
+Fold 3: Test Acc = 68,64 ± 4,60, Train Acc = 68,47 ± 4,84, Time = 7,56s ± 0,35s
+Fold 4: Test Acc = 68,57 ± 5,21, Train Acc = 67,53 ± 4,45, Time = 7,62s ± 0,35s
+Overall Test Accuracy: 68,06 ± 4,43
+Overall Train Accuracy: 67,75 ± 4,42
+Overall Time: 7,67 seconds ± 0,58 seconds
 
 Sonar:
+Fold 0: Test Acc = 64,30 ± 7,47, Train Acc = 65,27 ± 7,04, Time = 3,90s ± 0,56s
+Fold 1: Test Acc = 60,36 ± 7,54, Train Acc = 60,90 ± 6,34, Time = 3,85s ± 0,14s
+Fold 2: Test Acc = 64,15 ± 7,12, Train Acc = 64,46 ± 7,45, Time = 3,85s ± 0,12s
+Fold 3: Test Acc = 65,37 ± 7,38, Train Acc = 65,99 ± 7,81, Time = 3,86s ± 0,10s
+Fold 4: Test Acc = 64,39 ± 8,50, Train Acc = 62,13 ± 7,18, Time = 3,82s ± 0,12s
+Overall Test Accuracy: 63,71 ± 7,81
+Overall Train Accuracy: 63,75 ± 7,43
+Overall Time: 3,85 seconds ± 0,27 seconds
 
 Iris:
+Fold 0: Test Acc = 98,00 ± 1,63, Train Acc = 94,71 ± 1,57, Time = 0,18s ± 0,12s
+Fold 1: Test Acc = 97,67 ± 2,60, Train Acc = 93,75 ± 2,48, Time = 0,16s ± 0,02s
+Fold 2: Test Acc = 95,83 ± 3,48, Train Acc = 94,96 ± 2,36, Time = 0,16s ± 0,01s
+Fold 3: Test Acc = 96,50 ± 2,88, Train Acc = 94,50 ± 1,81, Time = 0,16s ± 0,02s
+Fold 4: Test Acc = 96,00 ± 2,49, Train Acc = 93,92 ± 2,69, Time = 0,16s ± 0,01s
+Overall Test Accuracy: 96,80 ± 2,83
+Overall Train Accuracy: 94,37 ± 2,27
+Overall Time: 0,16 seconds ± 0,05 seconds
 
 Glass:
+Fold 0: Test Acc = 55,33 ± 5,11, Train Acc = 56,60 ± 4,68, Time = 0,63s ± 0,20s
+Fold 1: Test Acc = 55,00 ± 5,50, Train Acc = 56,24 ± 5,07, Time = 0,60s ± 0,05s
+Fold 2: Test Acc = 57,09 ± 7,26, Train Acc = 56,58 ± 5,65, Time = 0,60s ± 0,04s
+Fold 3: Test Acc = 53,33 ± 6,83, Train Acc = 54,53 ± 5,97, Time = 0,60s ± 0,03s
+Fold 4: Test Acc = 57,12 ± 6,34, Train Acc = 54,54 ± 5,36, Time = 0,60s ± 0,03s
+Overall Test Accuracy: 55,58 ± 6,42
+Overall Train Accuracy: 55,70 ± 5,45
+Overall Time: 0,60 seconds ± 0,09 seconds
