@@ -51,6 +51,11 @@ namespace AISIGA.Program.IGA
             this.Antibodies.Add(antibody);
         }
 
+        public void AddAllAntigens(List<Antigen> antigens)
+        {
+            this.Antigens = antigens;
+        }
+
         private void SortByFitness()
         {
             VALIS.AssingAGClassByVoting(Antibodies, Antigens);

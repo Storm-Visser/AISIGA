@@ -23,4 +23,8 @@
 		<Page Include="App.xaml" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Results\Phase3\" />
+	</ItemGroup>
+
 </Project>

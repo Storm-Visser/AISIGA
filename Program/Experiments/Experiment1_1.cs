@@ -14,7 +14,7 @@ namespace AISIGA.Program.Experiments
         public override int NumberOfGenerations => 200;
         public override double PopulationSizeFractionOfDatapoints => 1;
         public override double PercentageOfParents => 0.2;
-        public override int DataSetNr => 3;
+        public override int DataSetNr => 4;
         public override int NumberOfIslands => 4;
 
         public override double MutationRate => 0.4;
@@ -40,7 +40,7 @@ namespace AISIGA.Program.Experiments
         public override int TournamentSize => 2;
         public override bool UseClassRatioLocking => true;
         public override bool UseUnboundedRatioLocking => false;
-        public override double RateOfUnboundedRegions => 0.2;   
-
+        public override double RateOfUnboundedRegions => 0.2;
+        public override bool DivideAntigens => false;
     }
 }

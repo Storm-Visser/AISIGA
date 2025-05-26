@@ -54,7 +54,7 @@ namespace AISIGA.Program
         {
             List<Antigen> allAntigens = Data.DataHandler.TranslateDataToAntigens(Config.DataSetNr);
             List<Result> results = new List<Result>();
-            for (int run = 0; run < 20; run++)
+            for (int run = 0; run < 5; run++)
             {
                 List<(List<Antigen> Train, List<Antigen> Test)> folds = Data.DataHandler.GenerateStratifiedKFolds(allAntigens, Config.KFoldCount);
 
@@ -121,17 +121,27 @@ namespace AISIGA.Program
             }
             RandomizeAntibodies(antibodies);
 
-            //Divide the TrainAntigens into the islands Round robin style
-            for (int i = 0; i < this.TrainAntigens.Count; i++)
+            if (Config.DivideAntigens)
             {
-                int islandIndex = i % 4;
-                this.Islands[islandIndex].AddAntigen(this.TrainAntigens[i]);
-                //add the antibodies aswell while we are at it
-                if (i < antibodies.Count)
+                //Divide the TrainAntigens into the islands Round robin style
+                for (int i = 0; i < this.TrainAntigens.Count; i++)
                 {
-                    this.Islands[islandIndex].AddAntibody(antibodies[i]);
+                    int islandIndex = i % 4;
+                    this.Islands[islandIndex].AddAntigen(this.TrainAntigens[i]);
                 }
             }
+            else
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    this.Islands[i].AddAllAntigens(this.TrainAntigens);
+                }
+            }
+
+            for (int i = 0; i < antibodies.Count; i++) {
+                int islandIndex = i % 4;
+                this.Islands[islandIndex].AddAntibody(antibodies[i]);
+            }            
         }
 
         private void RandomizeAntibodies(List<Antibody> antibodies)

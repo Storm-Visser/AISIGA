@@ -41,5 +41,6 @@ namespace AISIGA.Program.Experiments
         public override bool UseClassRatioLocking => true;
         public override bool UseUnboundedRatioLocking => false;
         public override double RateOfUnboundedRegions => 0.2;
+        public override bool DivideAntigens => true;
     }
 }
