@@ -1,0 +1,31 @@
+Iris:
+W locking:
+	start:
+		Unbounded Region Statistics:
+		% AB with =>1 UB (All): 20,833333333333336%
+		% Unbounded Regions (All): 5,208333333333334%
+		% Unbounded Regions (Left): 44%
+		% Unbounded Regions (Right): 56,00000000000001%
+		Average Unbounded Regions per Antibody: 5,21%
+	end:
+		Unbounded Region Statistics:
+		% AB with =>1 UB (All): 20%
+		% Unbounded Regions (All): 14,583333333333334%
+		% Unbounded Regions (Left): 52,85714285714286%
+		% Unbounded Regions (Right): 47,14285714285714%
+		Average Unbounded Regions per Antibody: 14,58%
+W/O locking
+	start
+		% AB with =>1 UB (All): 19,166666666666668%
+		% Unbounded Regions (All): 19,166666666666668%
+		% Unbounded Regions (Left): 50%
+		% Unbounded Regions (Right): 50%
+		Average Unbounded Regions per Antibody: 19,17%
+	end:
+		Unbounded Region Statistics:
+		% AB with =>1 UB (All): 91,66666666666666%
+		% Unbounded Regions (All): 55,625%
+		% Unbounded Regions (Left): 55,430711610486895%
+		% Unbounded Regions (Right): 44,569288389513105%
+		Average Unbounded Regions per Antibody: 55,63%
+

@@ -54,7 +54,7 @@ namespace AISIGA.Program
         {
             List<Antigen> allAntigens = Data.DataHandler.TranslateDataToAntigens(Config.DataSetNr);
             List<Result> results = new List<Result>();
-            for (int run = 0; run < 20; run++)
+            for (int run = 0; run < 5; run++)
             {
                 List<(List<Antigen> Train, List<Antigen> Test)> folds = Data.DataHandler.GenerateStratifiedKFolds(allAntigens, Config.KFoldCount);
 
@@ -65,9 +65,7 @@ namespace AISIGA.Program
                     this.TrainAntigens = folds[i].Train;
                     this.TestAntigens = folds[i].Test;
                     DivideAntigenAndAntibodies();
-                    ShowUBDistribution();
                     StartExperiment();
-                    ShowUBDistribution();
                     stopwatch.Stop();
                     System.Diagnostics.Trace.WriteLine($"Run {run + 1}, Fold {i + 1}: Elapsed time: {stopwatch.Elapsed.TotalSeconds} seconds");
                     System.Diagnostics.Trace.WriteLine($"Run {run + 1}, Fold {i + 1}: Test Accuracy: {BestAntibodyNetworkTestAccuracy}%");
