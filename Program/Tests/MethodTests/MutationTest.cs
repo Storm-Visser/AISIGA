@@ -28,7 +28,8 @@ namespace AISIGA.Program.Tests.MethodTests
                 classMinFeatureValues,
                 config.UseHyperSpheres,
                 config.UseUnboundedRegions,
-                config.RateOfUnboundedRegions
+                config.RateOfUnboundedRegions,
+                config.UseUnboundedRatioLocking
             );
 
             testAB.AssingClassAndRadius(1, 1);

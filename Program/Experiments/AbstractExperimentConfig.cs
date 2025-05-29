@@ -40,6 +40,7 @@ namespace AISIGA.Program.Experiments
         public abstract int TournamentSize { get; }
         public abstract bool UseClassRatioLocking { get; }
         public abstract bool UseUnboundedRatioLocking { get; }
+        public abstract bool UseSoftClassRatiosWUnboundedLocking { get; }
         public abstract double RateOfUnboundedRegions { get; }
         public abstract bool DivideAntigens {  get; }
 

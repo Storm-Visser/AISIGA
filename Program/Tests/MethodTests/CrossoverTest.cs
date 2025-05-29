@@ -26,7 +26,8 @@ namespace AISIGA.Program.Tests.MethodTests
                 new List<double[]> { new double[] { 1.0, 1.0, 1.0 } },
                 config.UseHyperSpheres,
                 config.UseUnboundedRegions,
-                config.RateOfUnboundedRegions
+                config.RateOfUnboundedRegions,
+                config.UseUnboundedRatioLocking
             );
 
             testABP2.AssignRandomFeatureValuesAndMultipliers(
@@ -34,7 +35,8 @@ namespace AISIGA.Program.Tests.MethodTests
                 new List<double[]> { new double[] { 2.0, 2.0, 2.0 } },
                 config.UseHyperSpheres,
                 config.UseUnboundedRegions,
-                config.RateOfUnboundedRegions
+                config.RateOfUnboundedRegions,
+                config.UseUnboundedRatioLocking
             );
 
             System.Diagnostics.Debug.WriteLine("TestAB parents: ");

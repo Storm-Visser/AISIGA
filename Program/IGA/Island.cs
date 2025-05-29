@@ -4,6 +4,7 @@ using AISIGA.Program.Data;
 using AISIGA.Program.Experiments;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
 using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
@@ -76,11 +77,26 @@ namespace AISIGA.Program.IGA
             // Remove the excess antibodies
             if (Config.UseClassRatioLocking)
             {
-                ReplaceByClassWithPartialElitism(originalClassDistribution, 0.2);
+                if (Config.UseUnboundedRatioLocking)
+                {
+                    if (Config.UseSoftClassRatiosWUnboundedLocking)
+                    {
+                        ReplaceByUnboundedRatioWithPartialElitismAndSoftBalanceClasses(Config.ElitismPercentage);
+                    }
+                    else
+                    {
+                        ReplaceByUnboundedRatioOnly(Config.ElitismPercentage);
+                    }
+                }
+                else
+                {
+
+                    ReplaceByClassWithPartialElitism(originalClassDistribution, Config.ElitismPercentage);
+                }
             }
             else
             {
-                ReplaceByPartialFitness(0.2);
+                ReplaceByPartialFitness(Config.ElitismPercentage);
             }
         }
 
@@ -156,7 +172,22 @@ namespace AISIGA.Program.IGA
             // Remove the excess antibodies
             if (Config.UseClassRatioLocking)
             {
-                ReplaceByClassWithPartialElitism(originalClassDistribution, Config.ElitismPercentage);
+                if (Config.UseUnboundedRatioLocking)
+                {
+                    if (Config.UseSoftClassRatiosWUnboundedLocking)
+                    {
+                        ReplaceByUnboundedRatioWithPartialElitismAndSoftBalanceClasses(Config.ElitismPercentage);
+                    }
+                    else
+                    {
+                        ReplaceByUnboundedRatioOnly(Config.ElitismPercentage);
+                    }
+                }
+                else
+                {
+
+                    ReplaceByClassWithPartialElitism(originalClassDistribution, Config.ElitismPercentage);
+                }
             }
             else
             {
@@ -297,6 +328,174 @@ namespace AISIGA.Program.IGA
                 .Take(totalTargetSize)
                 .ToList();
         }
+
+        public void ReplaceByUnboundedRatioWithPartialElitismAndSoftBalanceClasses(double eliteFraction)
+        {
+            int totalTargetSize = (int)(this.Antigens.Count * Config.PopulationSizeFractionOfDatapoints);
+            int desiredUBCount = (int)(totalTargetSize * Config.RateOfUnboundedRegions);
+
+            // Group antibodies by class for soft diversity
+            var classGroups = Antibodies
+                .GroupBy(ab => ab.GetClass())
+                .ToDictionary(g => g.Key, g => g.OrderByDescending(ab => ab.GetFitness().GetTotalFitness()).ToList());
+
+            // Soft-balanced initial selection
+            List<Antibody> initialPool = new List<Antibody>();
+            int remainingSlots = totalTargetSize;
+            int numClasses = classGroups.Count;
+
+            foreach (var kvp in classGroups)
+            {
+                int share = totalTargetSize / numClasses;
+                var candidates = kvp.Value.Take(share);
+                initialPool.AddRange(candidates);
+                remainingSlots -= candidates.Count();
+            }
+
+            // Fill remaining slots with best overall
+            if (remainingSlots > 0)
+            {
+                var extra = Antibodies
+                    .Except(initialPool)
+                    .OrderByDescending(ab => ab.GetFitness().GetTotalFitness())
+                    .Take(remainingSlots);
+                initialPool.AddRange(extra);
+            }
+
+            // Enforce UB ratio
+            int currentUBCount = initialPool.Count(ab => ab.GetFeatureDimTypes().Any(t => t == 1 || t == 2));
+
+            if (currentUBCount < desiredUBCount)
+            {
+                // Add UB, remove bounded
+                int needed = desiredUBCount - currentUBCount;
+
+                var toAdd = Antibodies
+                    .Where(ab => ab.GetFeatureDimTypes().Any(t => t == 1 || t == 2) && !initialPool.Contains(ab))
+                    .OrderByDescending(ab => ab.GetFitness().GetTotalFitness())
+                    .Take(needed)
+                    .ToList();
+
+                var toRemove = initialPool
+                    .Where(ab => ab.GetFeatureDimTypes().All(t => t == 0))
+                    .OrderBy(ab => ab.GetFitness().GetTotalFitness())
+                    .Take(toAdd.Count)
+                    .ToList();
+
+                for (int i = 0; i < Math.Min(toAdd.Count, toRemove.Count); i++)
+                {
+                    initialPool.Remove(toRemove[i]);
+                    initialPool.Add(toAdd[i]);
+                }
+            }
+            else if (currentUBCount > desiredUBCount)
+            {
+                // Remove excess UB, add bounded
+                int excess = currentUBCount - desiredUBCount;
+
+                var toRemove = initialPool
+                    .Where(ab => ab.GetFeatureDimTypes().Any(t => t == 1 || t == 2))
+                    .OrderBy(ab => ab.GetFitness().GetTotalFitness())
+                    .Take(excess)
+                    .ToList();
+
+                var toAdd = Antibodies
+                    .Where(ab => ab.GetFeatureDimTypes().All(t => t == 0) && !initialPool.Contains(ab))
+                    .OrderByDescending(ab => ab.GetFitness().GetTotalFitness())
+                    .Take(toRemove.Count)
+                    .ToList();
+
+                for (int i = 0; i < Math.Min(toAdd.Count, toRemove.Count); i++)
+                {
+                    initialPool.Remove(toRemove[i]);
+                    initialPool.Add(toAdd[i]);
+                }
+            }
+
+            // Final trim to maintain target size
+            Antibodies = initialPool
+                .OrderByDescending(ab => ab.GetFitness().GetTotalFitness())
+                .Take(totalTargetSize)
+                .ToList();
+        }
+
+        public void ReplaceByUnboundedRatioOnly(double eliteFraction)
+        {
+            int totalTargetSize = (int)(this.Antigens.Count * Config.PopulationSizeFractionOfDatapoints);
+            int desiredUBCount = (int)(totalTargetSize * Config.RateOfUnboundedRegions);
+
+            // Select elites
+            var sortedByFitness = Antibodies.OrderByDescending(ab => ab.GetFitness().GetTotalFitness()).ToList();
+            int eliteCount = (int)(totalTargetSize * eliteFraction);
+            List<Antibody> initialPool = sortedByFitness.Take(eliteCount).ToList();
+
+            // Fill the rest with randoms
+            var remainder = sortedByFitness.Skip(eliteCount).ToList();
+            var rng = RandomProvider.GetThreadRandom();
+            int randomCount = totalTargetSize - eliteCount;
+            var randoms = remainder.OrderBy(_ => rng.Next()).Take(randomCount);
+            initialPool.AddRange(randoms);
+
+            // Count current UB
+            int currentUBCount = initialPool.Count(ab => ab.GetFeatureDimTypes().Any(t => t == 1 || t == 2));
+
+            if (currentUBCount < desiredUBCount)
+            {
+                // Add UB, remove bounded
+                int needed = desiredUBCount - currentUBCount;
+
+                var toAdd = Antibodies
+                    .Where(ab => ab.GetFeatureDimTypes().Any(t => t == 1 || t == 2) && !initialPool.Contains(ab))
+                    .OrderByDescending(ab => ab.GetFitness().GetTotalFitness())
+                    .Take(needed)
+                    .ToList();
+
+                var toRemove = initialPool
+                    .Where(ab => ab.GetFeatureDimTypes().All(t => t == 0))
+                    .OrderBy(ab => ab.GetFitness().GetTotalFitness())
+                    .Take(toAdd.Count)
+                    .ToList();
+
+                for (int i = 0; i < Math.Min(toAdd.Count, toRemove.Count); i++)
+                {
+                    initialPool.Remove(toRemove[i]);
+                    initialPool.Add(toAdd[i]);
+                }
+            }
+            else if (currentUBCount > desiredUBCount)
+            {
+                // Remove excess UB, add bounded
+                int excess = currentUBCount - desiredUBCount;
+
+                var toRemove = initialPool
+                    .Where(ab => ab.GetFeatureDimTypes().Any(t => t == 1 || t == 2))
+                    .OrderBy(ab => ab.GetFitness().GetTotalFitness())
+                    .Take(excess)
+                    .ToList();
+
+                var toAdd = Antibodies
+                    .Where(ab => ab.GetFeatureDimTypes().All(t => t == 0) && !initialPool.Contains(ab))
+                    .OrderByDescending(ab => ab.GetFitness().GetTotalFitness())
+                    .Take(toRemove.Count)
+                    .ToList();
+
+                for (int i = 0; i < Math.Min(toAdd.Count, toRemove.Count); i++)
+                {
+                    initialPool.Remove(toRemove[i]);
+                    initialPool.Add(toAdd[i]);
+                }
+            }
+
+            // Final trim to maintain target size
+            Antibodies = initialPool
+                .OrderByDescending(ab => ab.GetFitness().GetTotalFitness())
+                .Take(totalTargetSize)
+                .ToList();
+        }
+
+
+
+
 
 
 

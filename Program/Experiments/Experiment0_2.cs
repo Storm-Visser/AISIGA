@@ -40,6 +40,7 @@ namespace AISIGA.Program.Experiments
         public override int TournamentSize => 3;
         public override bool UseClassRatioLocking => true;
         public override bool UseUnboundedRatioLocking => false;
+        public override bool UseSoftClassRatiosWUnboundedLocking => false;
         public override double RateOfUnboundedRegions => 0.2;
         public override bool DivideAntigens => true;
     }

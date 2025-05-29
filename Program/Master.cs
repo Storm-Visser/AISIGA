@@ -65,7 +65,9 @@ namespace AISIGA.Program
                     this.TrainAntigens = folds[i].Train;
                     this.TestAntigens = folds[i].Test;
                     DivideAntigenAndAntibodies();
+                    ShowUBDistribution();
                     StartExperiment();
+                    ShowUBDistribution();
                     stopwatch.Stop();
                     System.Diagnostics.Trace.WriteLine($"Run {run + 1}, Fold {i + 1}: Elapsed time: {stopwatch.Elapsed.TotalSeconds} seconds");
                     System.Diagnostics.Trace.WriteLine($"Run {run + 1}, Fold {i + 1}: Test Accuracy: {BestAntibodyNetworkTestAccuracy}%");
@@ -267,7 +269,7 @@ namespace AISIGA.Program
                 antibody.AssingClass(selectedClass);
 
                 // Assign the feature values and multipliers
-                antibody.AssignRandomFeatureValuesAndMultipliers(classMaxValues, classMinValues, Config.UseHyperSpheres, Config.UseUnboundedRegions, Config.RateOfUnboundedRegions);
+                antibody.AssignRandomFeatureValuesAndMultipliers(classMaxValues, classMinValues, Config.UseHyperSpheres, Config.UseUnboundedRegions, Config.RateOfUnboundedRegions, Config.UseUnboundedRatioLocking);
 
                 // Radius based on a random AB
                 // Get all AG of same class
@@ -295,6 +297,7 @@ namespace AISIGA.Program
 
             Barrier barrier = new Barrier(islandCount, (b) =>
             {
+                //ShowUBDistribution();
                 // This code runs ONCE after all threads hit the barrier
                 foreach (var island in Islands)
                 {
@@ -481,6 +484,52 @@ namespace AISIGA.Program
                 //System.Diagnostics.Trace.WriteLine($"Class {i}: {totalOfClass}");
                 System.Diagnostics.Trace.WriteLine($"Class {i}: {totalOfClass / (this.Islands[0].GetAntibodies().Count * 4)}");
             }
+        }
+
+        private void ShowUBDistribution()
+        {
+            double totalUB = 0;
+            double totalUBL = 0;
+            double totalUBR = 0;
+            double percentageUBPerAB = 0;
+            double totalUBAB = 0;
+            List <Antibody> ABs = this.GatherAntibodies();
+            foreach (Antibody AB in ABs)
+            {
+                bool added = false;
+                double UBinAB = 0;
+                foreach (int DimType in AB.GetFeatureDimTypes())
+                {
+                    if (DimType > 0)
+                    {
+                        if (!added)
+                        {
+                            totalUBAB += 1;
+                            added = true;
+                        }
+                        totalUB += 1;
+                        UBinAB += 1;
+                        if (DimType == 1)
+                        {
+                            totalUBL += 1;
+                        }
+                        else // 2
+                        {
+                            totalUBR += 1;
+                        }
+                    }
+                }
+                percentageUBPerAB += (UBinAB / AB.GetFeatureDimTypes().Length);
+            }
+            percentageUBPerAB = percentageUBPerAB / ABs.Count;
+
+            System.Diagnostics.Trace.WriteLine("Unbounded Region Statistics:");
+            System.Diagnostics.Trace.WriteLine($"% AB with =>1 UB (All): {(totalUBAB / ABs.Count) * 100}%");
+            System.Diagnostics.Trace.WriteLine($"% Unbounded Regions (All): {(totalUB / (ABs.Count * ABs[0].GetFeatureDimTypes().Length)) * 100}%");
+            System.Diagnostics.Trace.WriteLine($"% Unbounded Regions (Left): {(totalUBL / totalUB) * 100}%");
+            System.Diagnostics.Trace.WriteLine($"% Unbounded Regions (Right): {(totalUBR / totalUB) * 100}%");
+            System.Diagnostics.Trace.WriteLine($"Average Unbounded Regions per Antibody: {percentageUBPerAB:P2}");
+
         }
 
         private void SaveResultsToCsv(List<Result> results, string filePath)

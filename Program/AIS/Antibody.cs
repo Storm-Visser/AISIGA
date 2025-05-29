@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Automation;
 
 namespace AISIGA.Program.AIS
 {
@@ -101,12 +102,13 @@ namespace AISIGA.Program.AIS
         }
 
 
-        public void AssignRandomFeatureValuesAndMultipliers(List<double[]> ClassMaxFeatureValues, List<double[]> ClassMinFeatureValues, bool useHyperSpheres, bool useUnbounded, double UnboundedChance)
+        public void AssignRandomFeatureValuesAndMultipliers(List<double[]> ClassMaxFeatureValues, List<double[]> ClassMinFeatureValues, bool useHyperSpheres, bool useUnbounded, double UnboundedChance, bool useUBRatioLock)
         {
             //cance of an ab to be unbounded, prevent everything from being unbounded
-            if (RandomProvider.GetThreadRandom().NextDouble() < UnboundedChance)
+            bool IsThisABUnbounded = false;
+            if(useUnbounded)
             {
-                useUnbounded = false;
+                IsThisABUnbounded = (RandomProvider.GetThreadRandom().NextDouble() < UnboundedChance);
             }
             for (int i = 0; i < FeatureValues.Length; i++)
             {
@@ -121,15 +123,31 @@ namespace AISIGA.Program.AIS
                 {
                     FeatureMultipliers[i] = (RandomProvider.GetThreadRandom().NextDouble() * 1.9) + 0.1;
                 }
-                if (useUnbounded)
+                if (IsThisABUnbounded && !useUBRatioLock)
                 {
-                    FeatureDimTypes[i] = RandomProvider.GetThreadRandom().Next(0, 3);
+                    FeatureDimTypes[i] = RandomProvider.GetThreadRandom().Next(1, 3);
                     
                 }
                 else
                 {
                     FeatureDimTypes[i] = 0;
                 }
+            }
+            if (IsThisABUnbounded && useUBRatioLock)
+            {
+                int amountOfUBInAB = (int)(UnboundedChance * FeatureValues.Length);
+                if (amountOfUBInAB == 0)
+                {
+                    amountOfUBInAB = 1;
+                }
+                int[] allIndices = Enumerable.Range(0, FeatureValues.Length).ToArray();
+                allIndices = allIndices.OrderBy(_ => RandomProvider.GetThreadRandom().Next()).ToArray();
+
+                for (int i = 0; i < amountOfUBInAB; i++) 
+                {
+                    FeatureDimTypes[allIndices[i]] = RandomProvider.GetThreadRandom().Next(1, 3);
+                }
+
             }
         }
 
