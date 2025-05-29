@@ -12,7 +12,14 @@ Diabetes:
 SKIP
 
 Ionosphere:
-
+Fold 0: Test Acc = 63,45 ± 0,31, Train Acc = 64,34 ± 0,23, Time = 227,98s ± 10,49s
+Fold 1: Test Acc = 64,71 ± 1,36, Train Acc = 64,32 ± 0,85, Time = 231,14s ± 13,42s
+Fold 2: Test Acc = 64,93 ± 1,94, Train Acc = 64,80 ± 2,45, Time = 227,70s ± 9,49s
+Fold 3: Test Acc = 64,43 ± 0,43, Train Acc = 64,22 ± 0,56, Time = 233,24s ± 11,56s
+Fold 4: Test Acc = 64,57 ± 0,73, Train Acc = 64,22 ± 0,70, Time = 229,73s ± 8,97s
+Overall Test Accuracy: 64,42 ± 1,24
+Overall Train Accuracy: 64,38 ± 1,25
+Overall Time: 229,96 seconds ± 11,10 seconds
 
 Sonar:
 Fold 0: Test Acc = 53,49 ± 0,00, Train Acc = 53,33 ± 0,00, Time = 89,26s ± 3,27s
