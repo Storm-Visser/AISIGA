@@ -28,7 +28,7 @@ public partial class MainWindow : Window
     {
         
         this.Hide();
-        Tests.Run();
+        //Tests.Run();
         // Initialize the experiment configuration & the controller
         AbstractExperimentConfig expConfig = new Experiment1_1();
         // Example: Show the dashboard

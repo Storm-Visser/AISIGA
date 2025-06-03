@@ -50,14 +50,14 @@ Overall Test Accuracy: 72,98 ± 4,10
 Overall Train Accuracy: 73,13 ± 3,63
 Overall Time: 3,92 seconds ± 0,36 seconds
 No master migration
-Fold 0: Test Acc = 71,90 ± 4,04, Train Acc = 74,66 ± 3,60, Time = 3,63s ± 0,67s
-Fold 1: Test Acc = 70,93 ± 5,89, Train Acc = 72,08 ± 3,64, Time = 3,54s ± 0,14s
-Fold 2: Test Acc = 73,57 ± 6,48, Train Acc = 73,49 ± 4,87, Time = 3,51s ± 0,05s
-Fold 3: Test Acc = 74,64 ± 4,26, Train Acc = 74,80 ± 4,08, Time = 3,53s ± 0,04s
-Fold 4: Test Acc = 74,50 ± 4,17, Train Acc = 75,21 ± 3,24, Time = 3,50s ± 0,06s
-Overall Test Accuracy: 73,11 ± 5,28
-Overall Train Accuracy: 74,05 ± 4,09
-Overall Time: 3,54 seconds ± 0,31 seconds
+Fold 0: Test Acc = 70,63 ± 5,55, Train Acc = 72,71 ± 4,06, Time = 3,84s ± 0,53s
+Fold 1: Test Acc = 72,71 ± 5,27, Train Acc = 72,94 ± 3,98, Time = 3,73s ± 0,15s
+Fold 2: Test Acc = 72,29 ± 3,63, Train Acc = 73,67 ± 2,84, Time = 3,73s ± 0,08s
+Fold 3: Test Acc = 72,57 ± 3,31, Train Acc = 73,83 ± 2,98, Time = 3,75s ± 0,09s
+Fold 4: Test Acc = 74,14 ± 4,35, Train Acc = 74,57 ± 2,24, Time = 3,73s ± 0,07s
+Overall Test Accuracy: 72,47 ± 4,64
+Overall Train Accuracy: 73,54 ± 3,36
+Overall Time: 3,76 seconds ± 0,26 seconds
 
 Sonar:
 100
