@@ -19,6 +19,7 @@ namespace AISIGA.Program.Tests.MethodTests
             TestHypersphere();
             TestHyperellipsoid();
             TestOneUnboundedRegion();
+            TestOneUnboundedRegionOppositeDirUnimplemented();
             TestOneUnboundedRegionOppositeDir();
         }
         private static void TestHypersphere()
@@ -96,7 +97,7 @@ namespace AISIGA.Program.Tests.MethodTests
                 baseRadius: 1.0,
                 featureValues: new double[] { 5.0, 5.0 },
                 featureMultipliers: new double[] { 0.5, 3 },
-                featureDimTypes: new int[] { 2, 0 },
+                featureDimTypes: new int[] { 1, 0 },
                 fitness: new Fitness(),
                 IsCalculationStillValid: true
             );
@@ -125,7 +126,7 @@ namespace AISIGA.Program.Tests.MethodTests
             System.Diagnostics.Trace.WriteLine($"Outside antigen: {outside} (should be > 0)");
         }
 
-        private static void TestOneUnboundedRegionOppositeDir()
+        private static void TestOneUnboundedRegionOppositeDirUnimplemented()
         {
             // Create antibody at (5, 5)
             Antibody ab = new Antibody(
@@ -134,6 +135,43 @@ namespace AISIGA.Program.Tests.MethodTests
                 featureValues: new double[] { 5.0, 5.0 },
                 featureMultipliers: new double[] { 0.5, 3 },
                 featureDimTypes: new int[] { 1, 0 },
+                fitness: new Fitness(),
+                IsCalculationStillValid: true
+            );
+
+            // Inside: close to center
+            Antigen insideAg = new Antigen(0, 0, 2);
+            insideAg.SetFeatureValues(new double[] { 4.8, 6.0 });
+
+            // something far away but inside the unbounded region
+            Antigen farInsideAg = new Antigen(0, 0, 2);
+            farInsideAg.SetFeatureValues(new double[] { 1000, 15.0 });
+
+            // Outside: a bit further from center
+            Antigen outsideAg = new Antigen(0, 0, 2);
+            outsideAg.SetFeatureValues(new double[] { -1000, 5.0 });
+
+            // Evaluate distances
+            double inside = FitnessFunctions.CalcAGtoABDistance(ab, insideAg);
+            double edge = FitnessFunctions.CalcAGtoABDistance(ab, farInsideAg);
+            double outside = FitnessFunctions.CalcAGtoABDistance(ab, outsideAg);
+
+            // Output
+            System.Diagnostics.Trace.WriteLine("Unbounded detection test");
+            System.Diagnostics.Trace.WriteLine($"Inside antigen: {inside} (should be <= 0)");
+            System.Diagnostics.Trace.WriteLine($"Far inside antigen: {edge} (should be (big negative nr) <= 0)");
+            System.Diagnostics.Trace.WriteLine($"Outside antigen: {outside} (should be > 0)");
+        }
+
+        private static void TestOneUnboundedRegionOppositeDir()
+        {
+            // Create antibody at (5, 5)
+            Antibody ab = new Antibody(
+                assignedClass: 0,
+                baseRadius: 1.0,
+                featureValues: new double[] { 5.0, 5.0 },
+                featureMultipliers: new double[] { 0.5, 3 },
+                featureDimTypes: new int[] { 2, 0 },
                 fitness: new Fitness(),
                 IsCalculationStillValid: true
             );

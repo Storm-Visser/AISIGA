@@ -11,8 +11,8 @@ namespace AISIGA.Program.Tests
     {
         public static void Run()
         { 
-            CrossoverTest.TestCrossover();
-            MutationTest.TestMutation();
+            //CrossoverTest.TestCrossover();
+            //MutationTest.TestMutation();
             DetectionOfAGByABTest.TestAGDetection();
         }
 

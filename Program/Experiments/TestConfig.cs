@@ -32,8 +32,8 @@ namespace AISIGA.Program.Experiments
         public override double eScoreMultiplier => 2.0;
 
         public override bool UseHyperSpheres => true;
-        public override bool UseHyperEllipsoids => false;
-        public override bool UseUnboundedRegions => false;
+        public override bool UseHyperEllipsoids => true;
+        public override bool UseUnboundedRegions => true;
         public override bool UseAffinityMaturationMutation => false;
         public override double ElitismPercentage => 0.2;
         public override bool UseTournamentSelection => true;

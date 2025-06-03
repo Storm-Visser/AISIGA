@@ -12,10 +12,14 @@ Outside antigen: 3 (should be > 0)
 
 Exp 1.1.3
 Unbounded detection test
-Inside antigen: -0,4888888888888885 (should be <= 0)
-Far inside antigen: 2020,111111111111 (should be (big negative nr) <= 0)
-Outside antigen: -1991 (should be > 0)
-Unbounded detection test
+Inside antigen: -1,2888888888888892 (should be <= 0)
+Far inside antigen: -1999,888888888889 (should be (big negative nr) <= 0)
+Outside antigen: 1989 (should be > 0)
+Reversed Unbounded detection test
 Inside antigen: -1,2888888888888892 (should be <= 0)
 Far inside antigen: 2000,111111111111 (should be (big negative nr) <= 0)
 Outside antigen: -2011 (should be > 0)
+Reversed Unbounded detection test after impl.
+Inside antigen: -0,4888888888888885 (should be <= 0)
+Far inside antigen: -1979,888888888889 (should be (big negative nr) <= 0)
+Outside antigen: 2009 (should be > 0)

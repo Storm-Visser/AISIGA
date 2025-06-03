@@ -10,6 +10,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using AISIGA.Program.Tests;
 
 namespace AISIGA.UI;
 
@@ -27,7 +28,7 @@ public partial class MainWindow : Window
     {
         
         this.Hide();
-
+        Tests.Run();
         // Initialize the experiment configuration & the controller
         AbstractExperimentConfig expConfig = new Experiment1_1();
         // Example: Show the dashboard
