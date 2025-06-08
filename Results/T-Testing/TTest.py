@@ -1,15 +1,17 @@
-﻿algo1 = [0.845, 0.855, 0.841, 0.850, 0.848]
-algo2 = [0.823, 0.832, 0.828, 0.833, 0.829]
+﻿from scipy.stats import ttest_rel
 
-# Compute differences
-differences = [a1 - a2 for a1, a2 in zip(algo1, algo2)]
+TestAcc = [54.89, 52.5, 55.81, 56.19, 57.25]
+Time = [0.77, 0.77, 0.79, 0.78, 0.78]
+TestAcc1 = TestAcc
+Time1 = Time
+TestAcc = [52.78, 51.93, 58.49, 54.64, 52.5]
+Time = [0.81, 0.77, 0.78, 0.77, 0.79]
 
-# Compute mean and std of the differences
-mean_diff = sum(differences) / len(differences)
-std_diff = (sum((d - mean_diff)**2 for d in differences) / (len(differences) - 1)) ** 0.5
+t_stat1, p_value1 = ttest_rel(TestAcc, TestAcc1)
+t_stat2, p_value2 = ttest_rel(Time, Time1)
 
-# Compute t
-from math import sqrt
-t_stat = mean_diff / (std_diff / sqrt(len(differences)))
+def format_p(p):
+    return f"{p:.4f}" if p >= 1e-4 else f"{p:.2e}"
 
-print(f"t = {t_stat:.4f}")
+print(f"Accuracy: t = {t_stat1:.4f}, p = {format_p(p_value1)} | Time: t = {t_stat2:.4f}, p = {format_p(p_value2)}")
+
