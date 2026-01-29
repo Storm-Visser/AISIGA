@@ -66,7 +66,6 @@ namespace AISIGA.Program
                     this.TestAntigens = folds[i].Test;
                     DivideAntigenAndAntibodies();
                     StartExperiment();
-                    stopwatch.Stop();
                     System.Diagnostics.Trace.WriteLine($"Run {run + 1}, Fold {i + 1}: Elapsed time: {stopwatch.Elapsed.TotalSeconds} seconds");
                     System.Diagnostics.Trace.WriteLine($"Run {run + 1}, Fold {i + 1}: Test Accuracy: {BestAntibodyNetworkTestAccuracy}%");
                     System.Diagnostics.Trace.WriteLine($"Run {run + 1}, Fold {i + 1}: Train Accuracy: {BestAntibodyNetworkTrainAccuracy}%");

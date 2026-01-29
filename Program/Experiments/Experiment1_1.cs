@@ -8,13 +8,13 @@ namespace AISIGA.Program.Experiments
 {
     class Experiment1_1 : AbstractExperimentConfig
     {
-        public override bool UseUI => true;
+        public override bool UseUI => false;
         public override int KFoldCount => 5;
 
         public override int NumberOfGenerations => 200;
         public override double PopulationSizeFractionOfDatapoints => 1;
         public override double PercentageOfParents => 0.2;
-        public override int DataSetNr => 3;
+        public override int DataSetNr => 2;
         public override int NumberOfIslands => 4;
 
         public override double MutationRate => 0.4;
@@ -42,6 +42,6 @@ namespace AISIGA.Program.Experiments
         public override bool UseUnboundedRatioLocking => false;
         public override bool UseSoftClassRatiosWUnboundedLocking => false;
         public override double RateOfUnboundedRegions => 0.2;
-        public override bool DivideAntigens => true;
+        public override bool DivideAntigens => false;
     }
 }
