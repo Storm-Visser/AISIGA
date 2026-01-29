@@ -7,6 +7,7 @@ Fold 4: Test Acc = 94,85 ± 2,61, Train Acc = 92,95 ± 2,87, Time = 5,05s ± 0,54s
 Overall Test Accuracy: 94,69 ± 3,79
 Overall Train Accuracy: 93,72 ± 3,05
 Overall Time: 5,02 seconds ± 0,68 seconds
+[94.32,93]
 dataset 2
 Fold 0: Test Acc = 65,36 ± 0,59, Train Acc = 65,42 ± 0,50, Time = 57,42s ± 0,65s
 Fold 1: Test Acc = 65,23 ± 0,60, Train Acc = 65,28 ± 0,26, Time = 57,44s ± 0,37s
