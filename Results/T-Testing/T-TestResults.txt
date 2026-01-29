@@ -1,0 +1,78 @@
+﻿Exp. 1.0 (base vs 1.0)
+Wine:			Accuracy: t = 0.3006, p = 0.7787 | Time: t = 6.5320, p = 0.0028
+Diabetes:		Accuracy: t = 5.9202, p = 0.0041 | Time: t = -8.0418, p = 0.0013
+Ioniosphere:	Accuracy: t = 1.0000, p = 0.3739 | Time: t = -10.7913, p = 0.0004
+Sonar:			Accuracy: t = -2.3459, p = 0.0789 | Time: t = -9.7980, p = 0.0006
+Iris:			Accuracy: t = -0.3726, p = 0.7284 | Time: t = -1.0000, p = 0.3739
+Glass:			Accuracy: t = 2.9651, p = 0.0413 | Time: t = -5.8797, p = 0.0042
+Exp. 1.1 (base vs 1.1))
+Wine:			Accuracy: t = -3.2000, p = 0.0329 | Time: t = 46.5403, p = 1.27e-06
+Diabetes:		Accuracy: t = 10.7182, p = 0.0004 | Time: t = -58.3109, p = 5.18e-07
+Ioniosphere:	Accuracy: t = 25.4460, p = 1.42e-05 | Time: t = -106.1467, p = 4.72e-08
+Sonar:			Accuracy: t = 6.2304, p = 0.0034 | Time: t = -188.5000, p = 4.75e-09
+Iris:			Accuracy: t = 2.5168, p = 0.0656 | Time: t = -11.0000, p = 0.0004
+Glass:			Accuracy: t = 2.0878, p = 0.1051 | Time: t = -16.5000, p = 7.90e-05
+Exp. 1.2 (1.2 vs 1.1)
+Wine:			Accuracy: t = -6.7130, p = 0.0026 | Time: t = -2700841328050849.0000, p = 1.13e-61
+Diabetes:		Accuracy: t = 4.2406, p = 0.0133 | Time: t = 66.0000, p = 3.16e-07
+Ioniosphere:	Accuracy: t = -0.1515, p = 0.8869 | Time: t = 41.6796, p = 1.98e-06
+Sonar:			Accuracy: t = 7.2508, p = 0.0019 | Time: t = 35.2785, p = 3.85e-06
+Iris:			Accuracy: t = 3.5935, p = 0.0229 | Time: t = 3.1623, p = 0.0341
+Glass:			Accuracy: t = 3.2658, p = 0.0309 | Time: t = 14.0000, p = 0.0002
+
+Exp. 2.0 vs 2.1
+Wine:			Accuracy: t = 1.9009, p = 0.1301 | Time: t = 88.1816, p = 9.91e-08
+Diabetes:		Accuracy: t = 10.7182, p = 0.0004 | Time: t = -341.0721, p = 4.43e-10
+Ioniosphere:	Accuracy: t = 12.8644, p = 0.0002 | Time: t = -79.6546, p = 1.49e-07
+Sonar:			Accuracy: t = -1.4658, p = 0.2166 | Time: t = -190.0533, p = 4.60e-09
+Iris:			Accuracy: t = -9.3755, p = 0.0007 | Time: t = -18.7794, p = 4.73e-05
+Glass:			Accuracy: t = -5.2982, p = 0.0061 | Time: t = -80.0167, p = 1.46e-07
+Exp. 2.0 vs 2.2
+Wine:			Accuracy: t = 1.1009, p = 0.3327 | Time: t = 120.0250, p = 2.89e-08
+Diabetes:		Accuracy: t = 10.7182, p = 0.0004 | Time: t = -306.1653, p = 6.83e-10
+Ioniosphere:	Accuracy: t = 19.9235, p = 3.74e-05 | Time: t = -116.4096, p = 3.27e-08
+Sonar:			Accuracy: t = 0.3569, p = 0.7392 | Time: t = -163.2588, p = 8.44e-09
+Iris:			Accuracy: t = -4.4105, p = 0.0116 | Time: t = -34.0000, p = 4.46e-06
+Glass:			Accuracy: t = -6.9826, p = 0.0022 | Time: t = -42.4578, p = 1.84e-06
+Exp. 2.1 vs 2.3
+Wine:			Accuracy: t = 1.7225, p = 0.1601 | Time: t = -26.0000, p = 1.30e-05
+Diabetes:		Accuracy: t = nan, p = nan | Time: t = 25.7793, p = 1.34e-05
+Ioniosphere:	Accuracy: t = -4.0572, p = 0.0154 | Time: t = 8.1607, p = 0.0012
+Sonar:			Accuracy: t = -1.3228, p = 0.2564 | Time: t = -7.8935, p = 0.0014
+Iris:			Accuracy: t = -0.8280, p = 0.4542 | Time: t = 11.0000, p = 0.0004
+Glass:			Accuracy: t = 1.9212, p = 0.1271 | Time: t = 6.3246, p = 0.0032
+Exp. 2.2 vs 2.3
+Wine:			Accuracy: t = 1.1902, p = 0.2998 | Time: t = 10.6145, p = 0.0004
+Diabetes:		Accuracy: t = nan, p = nan | Time: t = 12.3851, p = 0.0002
+Ioniosphere:	Accuracy: t = -0.5277, p = 0.6256 | Time: t = -0.8737, p = 0.4316
+Sonar:			Accuracy: t = 0.7755, p = 0.4814 | Time: t = -3.5233, p = 0.0244
+Iris:			Accuracy: t = 1.3338, p = 0.2532 | Time: t = nan, p = nan
+Glass:			Accuracy: t = -0.9082, p = 0.4152 | Time: t = 1.6330, p = 0.1778
+
+Exp. 3.0 (2.2 v 3.0)
+Wine:			Accuracy: t = 1.4802, p = 0.2129 | Time: t = 66.5786, p = 3.05e-07
+Ioniosphere:	Accuracy: t = -5.4576, p = 0.0055 | Time: t = 400.1460, p = 2.34e-10
+Sonar:			Accuracy: t = -12.1953, p = 0.0003 | Time: t = 165.2646, p = 8.04e-09
+Iris:			Accuracy: t = -1.2280, p = 0.2868 | Time: t = 172.5141, p = 6.77e-09
+Glass:			Accuracy: t = 7.4617, p = 0.0017 | Time: t = 90.7370, p = 8.84e-08
+Exp. 3.1 (2.3 v 3.1)
+Wine:			Accuracy: t = 0.3658, p = 0.7330 | Time: t = 95.8267, p = 7.11e-08
+Ioniosphere:	Accuracy: t = -6.3208, p = 0.0032 | Time: t = 209.2215, p = 3.13e-09
+Sonar:			Accuracy: t = -13.9007, p = 0.0002 | Time: t = 222.4382, p = 2.45e-09
+Iris:			Accuracy: t = -0.9222, p = 0.4086 | Time: t = 281.8982, p = 9.50e-10
+Glass:			Accuracy: t = 3.2208, p = 0.0323 | Time: t = 151.2342, p = 1.15e-08
+
+Exp. 4.0 (2.3 v 4.0)
+Wine:			Accuracy: t = -4.9467, p = 0.0078 | Time: t = 40.3999, p = 2.24e-06
+Diabetes:		Accuracy: t = 1.0000, p = 0.3739 | Time: t = 56.0363, p = 6.07e-07
+Ioniosphere:	Accuracy: t = 2.1262, p = 0.1006 | Time: t = 79.8053, p = 1.48e-07
+Sonar:			Accuracy: t = -14.7416, p = 0.0001 | Time: t = 92.7672, p = 8.10e-08
+Iris:			Accuracy: t = -6.4323, p = 0.0030 | Time: t = 9.0000, p = 0.0008
+Glass:			Accuracy: t = -3.3283, p = 0.0292 | Time: t = 42.2273, p = 1.88e-06
+Exp. 4.1 (4.1 v 4.0)
+Wine:			Accuracy: t = -6.7492, p = 0.0025 | Time: t = -3.1623, p = 0.0341
+Diabetes:		Accuracy: t = -0.7116, p = 0.5160 | Time: t = 7.2730, p = 0.0019
+Ioniosphere:	Accuracy: t = -31.7456, p = 5.87e-06 | Time: t = 0.8341, p = 0.4511
+Sonar:			Accuracy: t = -25.5739, p = 1.39e-05 | Time: t = -7.9048, p = 0.0014
+Iris:			Accuracy: t = -3.5710, p = 0.0234 | Time: t = -1800560885367229.2500, p = 5.71e-61
+Glass:			Accuracy: t = -1.0466, p = 0.3543 | Time: t = 0.6470, p = 0.5529

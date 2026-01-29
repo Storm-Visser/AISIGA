@@ -1,0 +1,35 @@
+﻿Wine:
+Fold 0: Test Acc = 83.78 ± 6.89, Train Acc = 86.49 ± 5.25, Time = 0.51s ± 0.21s
+Fold 1: Test Acc = 87.08 ± 7.47, Train Acc = 88.70 ± 5.25, Time = 0.48s ± 0.05s
+Fold 2: Test Acc = 88.61 ± 7.55, Train Acc = 89.05 ± 5.96, Time = 0.48s ± 0.05s
+Fold 3: Test Acc = 88.29 ± 5.78, Train Acc = 89.58 ± 3.76, Time = 0.48s ± 0.02s
+Fold 4: Test Acc = 89.12 ± 5.96, Train Acc = 89.17 ± 4.38, Time = 0.47s ± 0.02s
+Overall Test Accuracy: 87.38 ± 7.04
+Overall Train Accuracy: 88.60 ± 5.10
+Overall Time: 0.48 seconds ± 0.10 seconds
+
+TestAcc = [83.78, 87.08, 88.61, 88.29, 89.12]
+Time = [0.51, 0.48, 0.48, 0.48, 0.47]
+Diabetes:
+Fold 0: Test Acc = 65.36 ± 0.95, Train Acc = 65.59 ± 0.92, Time = 6.77s ± 1.18s
+Fold 1: Test Acc = 65.32 ± 0.52, Train Acc = 65.59 ± 0.69, Time = 6.53s ± 0.22s
+Fold 2: Test Acc = 65.32 ± 0.72, Train Acc = 65.37 ± 0.42, Time = 6.50s ± 0.20s
+Fold 3: Test Acc = 65.92 ± 0.88, Train Acc = 65.34 ± 0.43, Time = 6.46s ± 0.22s
+Fold 4: Test Acc = 65.52 ± 0.41, Train Acc = 65.24 ± 0.68, Time = 6.49s ± 0.27s
+Overall Test Accuracy: 65.49 ± 0.76
+Overall Train Accuracy: 65.43 ± 0.67
+Overall Time: 6.55 seconds ± 0.58 seconds
+
+TestAcc = [65.36, 65.32, 65.32, 65.92, 65.52]
+Time = [6.77, 6.53, 6.5, 6.46, 6.49]
+Ionosphere:
+Fold 0: Test Acc = 63.38 ± 0.00, Train Acc = 64.29 ± 0.00, Time = 5.08s ± 0.95s
+Fold 1: Test Acc = 64.29 ± 0.00, Train Acc = 64.06 ± 0.00, Time = 4.87s ± 0.10s
+Fold 2: Test Acc = 64.57 ± 1.25, Train Acc = 64.22 ± 0.70, Time = 4.88s ± 0.14s
+Fold 3: Test Acc = 64.29 ± 0.00, Train Acc = 64.06 ± 0.00, Time = 4.89s ± 0.11s
+Fold 4: Test Acc = 64.29 ± 0.00, Train Acc = 64.06 ± 0.00, Time = 4.93s ± 0.10s
+Overall Test Accuracy: 64.16 ± 0.69
+Overall Train Accuracy: 64.13 ± 0.33
+Overall Time: 4.93 seconds ± 0.44 seconds
+TestAcc = [63.38, 64.29, 64.57, 64.29, 64.29]
+Time = [5.08, 4.87, 4.88, 4.89, 4.93]
