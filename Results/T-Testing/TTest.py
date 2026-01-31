@@ -1,11 +1,11 @@
 ﻿from scipy.stats import ttest_rel
 
-TestAcc = [54.89, 52.5, 55.81, 56.19, 57.25]
-Time = [0.77, 0.77, 0.79, 0.78, 0.78]
+TestAcc = [46.67, 49.89, 51.63, 51.67, 50.62]
+Time = [4.56, 4.58, 4.64, 4.65, 4.79]
 TestAcc1 = TestAcc
 Time1 = Time
-TestAcc = [52.78, 51.93, 58.49, 54.64, 52.5]
-Time = [0.81, 0.77, 0.78, 0.77, 0.79]
+TestAcc = [48.89, 51.93, 50.81, 50.48, 54.0]
+Time = [0.43, 0.4, 0.41, 0.4, 0.41]
 
 t_stat1, p_value1 = ttest_rel(TestAcc, TestAcc1)
 t_stat2, p_value2 = ttest_rel(Time, Time1)

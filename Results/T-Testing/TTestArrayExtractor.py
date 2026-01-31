@@ -51,19 +51,4 @@ def AddArraysToResults(filepath):
         file.writelines(updated_lines)
 
 # Run the function
-AddArraysToResults('../Phase1/Exp1_0Base.txt')
-AddArraysToResults('../Phase1/Exp1_1.txt')
-AddArraysToResults('../Phase1/Exp1_2.txt')
-AddArraysToResults('../Phase1/Exp1_3.txt')
-
-AddArraysToResults('../Phase2/Exp2_1.txt')
-AddArraysToResults('../Phase2/Exp2_2.txt')
-AddArraysToResults('../Phase2/Exp2_3.txt')
-AddArraysToResults('../Phase2/Exp2_4.txt')
-
-AddArraysToResults('../Phase3/Exp3_1NEW.txt')
-AddArraysToResults('../Phase3/Exp3_2NEW.txt')
-
-AddArraysToResults('../Phase4/Exp4_0.txt')
-AddArraysToResults('../Phase4/Exp4_1.txt')
-AddArraysToResults('../Phase4/Exp4_2.txt')
+AddArraysToResults('../MAIMBASELINE/MAIMBASELINE.txt')

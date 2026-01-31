@@ -78,3 +78,10 @@ Iris:			Accuracy: t = -3.5710, p = 0.0234 | Time: t = -1800560885367229.2500, p 
 Glass:			Accuracy: t = -1.0466, p = 0.3543 | Time: t = 0.6470, p = 0.5529
 
 Extra:
+MAIM vs AG division w HS (2.0)
+Wine:			Accuracy: t = -2.0030, p = 0.1157 | Time: t = -171.9839, p = 6.86e-09
+Diabetes:		Accuracy: t = 7.9473, p = 0.0014 | Time: t = -552.2829, p = 6.45e-11
+Ioniosphere:	Accuracy: t = 18.4942, p = 5.03e-05 | Time: t = -547.6564, p = 6.67e-11
+Sonar:			Accuracy: t = 0.0656, p = 0.9509 | Time: t = -88.7923, p = 9.64e-08
+Iris:			Accuracy: t = -1.6561, p = 0.1731 | Time: t = -141.2539, p = 1.51e-08
+Glass:			Accuracy: t = 1.2487, p = 0.2799 | Time: t = -100.7524, p = 5.82e-08
