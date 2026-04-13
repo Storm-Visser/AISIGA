@@ -85,3 +85,10 @@ Ioniosphere:	Accuracy: t = 18.4942, p = 5.03e-05 | Time: t = -547.6564, p = 6.67
 Sonar:			Accuracy: t = 0.0656, p = 0.9509 | Time: t = -88.7923, p = 9.64e-08
 Iris:			Accuracy: t = -1.6561, p = 0.1731 | Time: t = -141.2539, p = 1.51e-08
 Glass:			Accuracy: t = 1.2487, p = 0.2799 | Time: t = -100.7524, p = 5.82e-08
+
+Extra Diabetes:
+HE, Split vs no split:
+Diabetes:		Accuracy: t = nan, p = nan | Time: t = 250.2299, p = 1.53e-09
+HE+UB, Split vs no split:
+Diabetes:		Accuracy: t = nan, p = nan | Time: t = 371.1515, p = 3.16e-10
+
